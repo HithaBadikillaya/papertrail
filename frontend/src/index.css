@@ -116,6 +116,10 @@
     @apply border-border outline-ring/50;
   }
 
+  option {
+    @apply bg-background text-foreground;
+  }
+
   body {
     @apply bg-background text-foreground font-sans overflow-y-scroll;
   }

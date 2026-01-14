@@ -49,7 +49,7 @@ export default function CaptionGenerator() {
 
       <div className="flex gap-4">
         <select
-          className="border p-2 rounded"
+          className="border p-2 rounded bg-background text-foreground"
           value={platform}
           onChange={(e) => setPlatform(e.target.value)}
         >
@@ -61,7 +61,7 @@ export default function CaptionGenerator() {
         </select>
 
         <select
-          className="border p-2 rounded"
+          className="border p-2 rounded bg-background text-foreground"
           value={tone}
           onChange={(e) => setTone(e.target.value)}
         >
