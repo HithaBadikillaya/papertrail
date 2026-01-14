@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import captionRoutes from "./routes/caption.routes.js";
 
 dotenv.config();
 
@@ -14,6 +15,8 @@ app.get("/healthcheck", (_, res) => {
   res.json({ status: "ok" });
 });
 
+app.use("/api/captions", captionRoutes);
+
 app.listen(PORT, () => {
-  console.log(`server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
