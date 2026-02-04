@@ -1,0 +1,27 @@
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    
+    /* D.A.S.H Brand Colors */
+    --primary: 221 83% 53%; /* Your Primary Hex in HSL */
+    --primary-rgb: 37, 99, 235; /* Same color in RGB for glow effects */
+    
+    --secondary: 262 83% 58%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+  }
+
+  .dark {
+    --background: 222 47% 6%;
+    --foreground: 210 40% 98%;
+    --primary-rgb: 59, 130, 246;
+  }
+}
+
+/* Custom Font Integrations */
+@font-face {
+  font-family: 'Amarna';
+  src: url('/fonts/Amarna.woff2') format('woff2');
+  font-display: swap;
+}
