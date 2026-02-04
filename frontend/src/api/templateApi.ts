@@ -1,6 +1,6 @@
 import type { Template } from "../types/templates";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/templates";
 ;
 
 export async function getTemplates(): Promise<Template[]> {
