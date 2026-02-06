@@ -1,50 +1,116 @@
 import express from "express";
-import { buildPrompt } from "../utils/promptTemplates.js";
-import { generateCaption } from "../services/gemini.service.js";
+import { generateCaption } from "../services/hf.service.js";
+import {
+  getAllTemplates,
+  getTemplateById,
+  createTemplate,
+  updateTemplate,
+  deleteTemplate,
+} from "../services/templateService.js";
 
 const router = express.Router();
 
+/**
+ * @route POST /api/captions/generate
+ * @desc Generate a caption using a template and input text
+ */
 router.post("/generate", async (req, res) => {
   try {
-    const { platform, tone, content } = req.body;
+    const { inputText, templateId, platform, tone } = req.body;
 
-    if (
-      typeof platform !== "string" ||
-      typeof tone !== "string" ||
-      typeof content !== "string"
-    ) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid input types. platform, tone, and content must be strings.",
-      });
+    if (!inputText || !inputText.trim()) {
+      return res.status(400).json({ success: false, message: "inputText is required" });
     }
 
-    if (content.length > 500) {
-      return res.status(400).json({
-        success: false,
-        message: "Content exceeds maximum length of 500 characters.",
-      });
+    const template = getTemplateById(templateId);
+    if (!template) {
+      return res.status(404).json({ success: false, message: "Template not found" });
     }
 
-    if (!platform || !tone || !content.trim()) {
-      return res.status(400).json({
-        success: false,
-        message: "platform, tone, and content are required",
-      });
-    }
+    // Inject platform/tone if provided
+    const contextStr = `[Platform: ${platform || "General"}] [Tone: ${tone || "Professional"}]`;
+    const structureStr = template.structure ? `[Output Structure: ${template.structure}]` : "[Output Structure: Standard]";
 
-    const prompt = buildPrompt({ platform, tone, content });
-    const caption = await generateCaption(prompt);
+    // Unified instructional prompt for one-shot text generation
+    const mergedPrompt = `
+[Instruction: Generate a punchy, high-engagement social media caption.]
+[Context: Platform=${platform || "General"}, Tone=${tone || "Professional"}]
+[Structure: ${structureStr}]
+
+[Blueprint]:
+${template.content}
+
+[Subject Content]:
+${inputText}
+
+[Direct Output Only]:`.trim();
+
+    const resultCaption = await generateCaption(mergedPrompt);
 
     res.json({
       success: true,
-      caption,
+      caption: resultCaption,
     });
   } catch (error) {
-    console.error("Caption Error:", error);
-    res.status(500).json({
+    console.error("CAPTION_GENERATION_ERROR:", error);
+    res.status(500).json({ success: false, message: "Failed to generate caption" });
+  }
+});
+
+/**
+ * @route GET /api/captions/templates
+ * @desc Get all templates
+ */
+router.get("/templates", (req, res) => {
+  try {
+    const templates = getAllTemplates();
+    res.json(templates);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+/**
+ * @route POST /api/captions/templates
+ * @desc Create a new user template
+ */
+router.post("/templates", (req, res) => {
+  try {
+    const newTemplate = createTemplate(req.body);
+    res.status(201).json(newTemplate);
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+});
+
+/**
+ * @route PUT /api/captions/templates/:id
+ * @desc Update a user template
+ */
+router.put("/templates/:id", (req, res) => {
+  try {
+    const updated = updateTemplate(req.params.id, req.body);
+    res.json(updated);
+  } catch (error) {
+    res.status(error.message === "System templates cannot be modified" ? 403 : 404).json({
       success: false,
-      message: "Caption generation failed. Please try again later.",
+      message: error.message,
+    });
+  }
+});
+
+/**
+ * @route DELETE /api/captions/templates/:id
+ * @desc Delete a user template
+ */
+router.delete("/templates/:id", (req, res) => {
+  try {
+    deleteTemplate(req.params.id);
+    res.json({ success: true, message: "Template deleted" });
+  } catch (error) {
+    res.status(error.message === "System templates cannot be deleted" ? 403 : 404).json({
+      success: false,
+      message: error.message,
     });
   }
 });

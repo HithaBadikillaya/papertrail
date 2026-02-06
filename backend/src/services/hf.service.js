@@ -1,31 +1,51 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { InferenceClient } from "@huggingface/inference";
 import dotenv from "dotenv";
 dotenv.config();
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+/**
+ * AI Service Configuration
+ * Model: meta-llama/Meta-Llama-3-8B-Instruct
+ * Why: Modern, high-performance instruction-tuned model compatible with the HF Inference Router.
+ */
+const MODEL = "meta-llama/Meta-Llama-3-8B-Instruct";
+const hf = new InferenceClient(process.env.HF_API_KEY);
 
-if (!process.env.GOOGLE_GEMINI_API_KEY) {
-  console.warn("Warning: GOOGLE_GEMINI_API_KEY is missing via process.env");
+if (!process.env.HF_API_KEY) {
+  console.warn("D.A.S.H Warning: HF_API_KEY is missing via process.env");
 }
 
+/**
+ * Generates a concise social media caption using the chatCompletion API.
+ * Uses only model, messages, max_tokens, and temperature as requested.
+ */
 export async function generateCaption(prompt) {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
-
   try {
-    const response = await model.generateContent(prompt);
+    const response = await hf.chatCompletion({
+      model: MODEL,
+      messages: [
+        {
+          role: "system",
+          content: "You are a social media copywriter. Generate only the caption text. No preamble, no hashtags."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      max_tokens: 500,
+      temperature: 0.7,
+    });
 
-    clearTimeout(timeoutId);
-
-    if (response && response.response && response.response.text) {
-      return response.response.text().trim();
+    if (!response || !response.choices || response.choices.length === 0) {
+      throw new Error("Invalid response from Hugging Face Inference Router");
     }
 
-    throw new Error("Invalid response format from Gemini API");
+    return response.choices[0].message.content.trim();
   } catch (err) {
-    clearTimeout(timeoutId);
-    console.error("Gemini Service Error:", err);
+    if (err.httpResponse && err.httpResponse.body) {
+      console.error("HF Router Detail:", JSON.stringify(err.httpResponse.body));
+    }
+    console.error("CAPTION_GENERATION_SERVICE_ERROR:", err.message);
     throw err;
   }
 }

@@ -2,11 +2,31 @@
   "id": "caption",
   "name": "caption",
   "type": "caption",
-  "tone": "friendly",
-  "layout": [],
-  "global_rules": [
-    "no emojis"
+  "tone": "",
+  "layout": [
+    {
+      "id": "section_1",
+      "label": "title",
+      "order": 1,
+      "section_type": "title",
+      "content_source": "user_input"
+    },
+    {
+      "id": "section_2",
+      "label": "desc",
+      "order": 2,
+      "section_type": "paragraph",
+      "content_source": "ai_generated"
+    },
+    {
+      "id": "section_3",
+      "label": "conc",
+      "order": 3,
+      "section_type": "signature",
+      "content_source": "ai_generated"
+    }
   ],
-  "prompt_instruction": "none",
+  "global_rules": [],
+  "prompt_instruction": "me maling on a beach",
   "is_system_template": false
 }

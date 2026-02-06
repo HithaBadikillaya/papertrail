@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import templateRoutes from "./routes/templateRoutes.js";
 import captionRoutes from "./routes/caption.routes.js";
 
 dotenv.config();
@@ -33,8 +32,6 @@ app.get("/", (req, res) => {
   res.send("Template backend is running");
 });
 
-
-app.use("/api/templates", templateRoutes);
 
 app.get("/healthcheck", (_, res) => {
   res.json({ status: "ok" });

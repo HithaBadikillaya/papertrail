@@ -1,24 +1,20 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import "./index.css";
 
-import App from "./App";
 import Home from "./pages/Home";
-import Templates from "./pages/TemplatePage";
-import GenerateRouter from "./pages/generators/GenerateRouter";
+import CaptionGenerator from "./pages/generators/CaptionGenerator";
 
 function Main() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Home / Dashboard */}
         <Route path="/" element={<Home />} />
-        <Route path="/app" element={<App />} />
+        {/* Unified Captions Workspace */}
+        <Route path="/captions" element={<CaptionGenerator />} />
 
-        {/* Template Selection */}
-        <Route path="/templates" element={<Templates />} />
-
-        {/* Generator Router (caption / letter / etc) */}
-        <Route path="/generate/:type" element={<GenerateRouter />} />
+        {/* Redirect old routes */}
+        <Route path="/templates" element={<Navigate to="/captions" replace />} />
+        <Route path="/generate/:type" element={<Navigate to="/captions" replace />} />
       </Routes>
     </BrowserRouter>
   );

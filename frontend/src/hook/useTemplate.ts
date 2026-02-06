@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import type { Template } from "../types/templates";
-import { getTemplates, createTemplate, deleteTemplate } from "../api/templateApi";
-import { updateTemplate } from "../api/templateApi";
+import { getTemplates, createTemplate, deleteTemplate, updateTemplate } from "../services/captionApi";
+import type { Template } from "../services/captionApi";
 
 export function useTemplates() {
   const [templates, setTemplates] = useState<Template[]>([]);
@@ -20,20 +19,33 @@ export function useTemplates() {
     }
   }
 
-  async function addTemplate(template: Template) {
-    await createTemplate(template);
-    await loadTemplates();
+  async function addTemplate(template: Partial<Template>) {
+    try {
+      await createTemplate(template);
+      await loadTemplates();
+    } catch (err) {
+      setError((err as Error).message);
+    }
   }
 
   async function removeTemplate(id: string) {
-    await deleteTemplate(id);
-    setTemplates(prev => prev.filter(t => t.id !== id));
+    try {
+      await deleteTemplate(id);
+      setTemplates(prev => prev.filter(t => t.id !== id));
+    } catch (err) {
+      setError((err as Error).message);
+    }
   }
 
-  async function editTemplate(id: string, updatedData: Partial<Template>){
-    await updateTemplate(id, updatedData);
-    await loadTemplates();
+  async function editTemplate(id: string, updatedData: Partial<Template>) {
+    try {
+      await updateTemplate(id, updatedData);
+      await loadTemplates();
+    } catch (err) {
+      setError((err as Error).message);
+    }
   }
+
   useEffect(() => {
     loadTemplates();
   }, []);
@@ -44,6 +56,7 @@ export function useTemplates() {
     error,
     addTemplate,
     removeTemplate,
-    editTemplate
+    editTemplate,
+    refreshTemplates: loadTemplates
   };
 }

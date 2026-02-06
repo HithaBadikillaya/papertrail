@@ -1,17 +1,44 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { generateCaption } from "../../services/captionApi";
+import { useTemplates } from "../../hook/useTemplate";
+import type { Template } from "../../services/captionApi";
 
 export default function CaptionGenerator() {
-  const [content, setContent] = useState("");
+  const { templates, addTemplate, removeTemplate, editTemplate, loading: templatesLoading } = useTemplates();
+  const [inputText, setInputText] = useState("");
+  const [selectedTemplateId, setSelectedTemplateId] = useState("");
   const [platform, setPlatform] = useState("instagram");
   const [tone, setTone] = useState("casual");
   const [caption, setCaption] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // Modal states
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingTemplate, setEditingTemplate] = useState<Template | null>(null);
+  const [modalName, setModalName] = useState("");
+  const [modalContent, setModalContent] = useState("");
+  const [modalStructure, setModalStructure] = useState("");
+
+  // Preview Modal
+  const [previewTemplate, setPreviewTemplate] = useState<Template | null>(null);
+
+  const captionTemplates = templates.filter(t => t.category === "caption");
+
+  // Set default template once loaded
+  useEffect(() => {
+    if (captionTemplates.length > 0 && !selectedTemplateId) {
+      setSelectedTemplateId(captionTemplates[0].id);
+    }
+  }, [captionTemplates, selectedTemplateId]);
+
   const handleGenerate = async () => {
-    if (!content.trim()) {
-      setError("Please enter some content");
+    if (!inputText.trim()) {
+      setError("Please enter some input text");
+      return;
+    }
+    if (!selectedTemplateId) {
+      setError("Please select a template");
       return;
     }
 
@@ -21,154 +48,384 @@ export default function CaptionGenerator() {
 
     try {
       const result = await generateCaption({
+        inputText,
+        templateId: selectedTemplateId,
         platform,
         tone,
-        content,
       });
 
       setCaption(result);
-    } catch {
-      setError("Failed to generate caption");
+    } catch (err: any) {
+      setError(err.message || "Failed to generate caption");
     } finally {
       setLoading(false);
     }
   };
 
+  const openCreateModal = () => {
+    setEditingTemplate(null);
+    setModalName("");
+    setModalContent("");
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (t: Template, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (t.type === "system") return;
+    setEditingTemplate(t);
+    setModalName(t.name);
+    setModalContent(t.content);
+    setModalStructure(t.structure || "");
+    setIsModalOpen(true);
+  };
+
+  const handleSaveTemplate = async () => {
+    if (!modalName.trim() || !modalContent.trim()) return;
+
+    if (editingTemplate) {
+      await editTemplate(editingTemplate.id, {
+        name: modalName,
+        content: modalContent,
+        category: "caption",
+        structure: modalStructure
+      });
+    } else {
+      await addTemplate({
+        name: modalName,
+        content: modalContent,
+        category: "caption",
+        structure: modalStructure
+      });
+    }
+    setIsModalOpen(false);
+  };
+
+
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-background flex flex-col items-center p-4 md:p-10 relative overflow-y-auto">
       {/* Background Ambient Glow */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-secondary/10 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
+      <div className="fixed top-0 right-0 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[120px] pointer-events-none opacity-50" />
+      <div className="fixed bottom-0 left-0 w-[600px] h-[600px] bg-secondary/20 rounded-full blur-[120px] pointer-events-none opacity-50" />
 
-      <div className="relative z-10 w-full max-w-4xl space-y-8">
-
+      <div className="relative z-10 w-full max-w-6xl space-y-10 mt-6 pb-20">
         {/* Header Section */}
-        <div className="text-center space-y-2">
-          <h2 className="text-4xl md:text-5xl font-amarna font-bold text-foreground tracking-tight">
-            Caption Generator
-          </h2>
+        <div className="flex flex-col md:flex-row justify-between items-end gap-4 border-b border-border pb-6">
+          <div className="space-y-1">
+            <h2 className="text-4xl md:text-6xl font-amarna font-black text-foreground tracking-tighter decoration-primary decoration-4">
+              CAPTION WORKSPACE
+            </h2>
+            <p className="text-muted-foreground font-mono text-sm tracking-widest uppercase opacity-70">
+              High-Performance Social Copy Engine
+            </p>
+          </div>
+          <button
+            onClick={openCreateModal}
+            className="px-6 py-3 bg-foreground text-background font-black rounded-full hover:scale-105 transition-all shadow-[0_4px_20px_rgba(0,0,0,0.3)] text-sm tracking-tighter"
+          >
+            + NEW TEMPLATE
+          </button>
         </div>
 
-        {/* Main Interface Card */}
-        <div className="bg-card/50 backdrop-blur-xl border border-white/10 rounded-3xl p-1 shadow-2xl ring-1 ring-white/5">
-          <div className="bg-background/40 rounded-[1.3rem] p-6 md:p-10 space-y-8 border border-white/5">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Sidebar / Controls */}
+          <div className="lg:col-span-4 space-y-8">
+            {/* Tone & Platform Selection */}
+            <div className="bg-card/40 backdrop-blur-xl border border-border rounded-3xl p-8 space-y-6 shadow-xl">
+              <div className="space-y-4">
+                <label className="text-xs font-black tracking-widest text-muted-foreground uppercase opacity-80">
+                  Target Platform
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {["instagram", "twitter", "linkedin", "youtube", "whatsapp"].map((p) => (
+                    <button
+                      key={p}
+                      onClick={() => setPlatform(p)}
+                      className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all uppercase tracking-tighter ${platform === p
+                        ? "bg-primary text-primary-foreground border-primary shadow-[0_0_15px_rgba(var(--primary),0.3)]"
+                        : "bg-background/20 border-border text-foreground hover:border-primary/50"
+                        }`}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-            {/* Input Area - 'Hero' Input */}
-            <div className="space-y-4">
-              <label className="text-sm font-bold tracking-widest text-muted-foreground uppercase ml-1">
-                Describe your content
+              <div className="space-y-4">
+                <label className="text-xs font-black tracking-widest text-muted-foreground uppercase opacity-80">
+                  Brand Voice
+                </label>
+                <select
+                  className="w-full p-4 bg-background/50 border border-border rounded-2xl text-foreground font-bold focus:ring-2 focus:ring-primary/50 appearance-none cursor-pointer hover:bg-background/80 transition-colors"
+                  value={tone}
+                  onChange={(e) => setTone(e.target.value)}
+                >
+                  <option value="casual">Casual & Relatable</option>
+                  <option value="professional">Sleek & Professional</option>
+                  <option value="promotional">Hype & High-Energy</option>
+                  <option value="witty">Witty & Sharp</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Content Input Area */}
+            <div className="bg-card/40 backdrop-blur-xl border border-border rounded-3xl p-8 space-y-4 shadow-xl">
+              <label className="text-xs font-black tracking-widest text-muted-foreground uppercase opacity-80">
+                Core Message
               </label>
               <textarea
-                className="w-full min-h-[160px] p-6 text-lg bg-input/50 border border-border rounded-xl focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-muted-foreground/50 resize-y"
-                placeholder="Paste your rough thoughts here... e.g. 'Photo of me hiking in the alps, sunset, feeling grateful'"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                aria-label="Caption prompt"
+                className="w-full min-h-[200px] p-6 text-lg bg-background/50 border border-border rounded-2xl focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-muted-foreground/30 resize-none font-medium leading-relaxed"
+                placeholder="What's the story you want to tell? Paste raw notes, bullet points, or rough drafts..."
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
               />
-            </div>
-
-            {/* Controls Row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-3">
-                <label className="text-sm font-bold tracking-widest text-muted-foreground uppercase ml-1">
-                  Platform
-                </label>
-                <div className="relative group">
-                  <select
-                    className="w-full appearance-none p-4 pl-5 bg-input/50 border border-border rounded-xl text-foreground font-medium focus:ring-2 focus:ring-primary/50 transition-all cursor-pointer hover:bg-input/70"
-                    value={platform}
-                    onChange={(e) => setPlatform(e.target.value)}
-                    aria-label="Select Platform"
-                  >
-                    <option value="instagram">Instagram</option>
-                    <option value="twitter">X (Twitter)</option>
-                    <option value="linkedin">LinkedIn</option>
-                    <option value="youtube">YouTube</option>
-                    <option value="whatsapp">WhatsApp</option>
-                  </select>
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
-                    ▼
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <label className="text-sm font-bold tracking-widest text-muted-foreground uppercase ml-1">
-                  Vibe
-                </label>
-                <div className="relative group">
-                  <select
-                    className="w-full appearance-none p-4 pl-5 bg-input/50 border border-border rounded-xl text-foreground font-medium focus:ring-2 focus:ring-primary/50 transition-all cursor-pointer hover:bg-input/70"
-                    value={tone}
-                    onChange={(e) => setTone(e.target.value)}
-                    aria-label="Select Tone"
-                  >
-                    <option value="casual">Casual</option>
-                    <option value="formal">Professional</option>
-                    <option value="promotional">Hype & Sales</option>
-                  </select>
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
-                    ▼
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Action Area */}
-            <div className="pt-4">
               <button
                 type="button"
                 onClick={handleGenerate}
-                disabled={loading}
-                className="w-full py-5 bg-primary text-primary-foreground text-xl font-bold rounded-xl hover:brightness-110 hover:shadow-[0_0_30px_rgba(var(--primary),0.3)] active:scale-[0.99] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+                disabled={loading || templatesLoading}
+                className="w-full py-5 bg-primary text-primary-foreground text-xl font-black rounded-2xl hover:brightness-110 shadow-lg active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-3 uppercase tracking-tighter"
               >
                 {loading ? (
-                  <>
-                    <span className="w-5 h-5 border-3 border-current border-t-transparent rounded-full animate-spin" />
-                    Crafting Magic...
-                  </>
+                  <span className="w-6 h-6 border-4 border-current border-t-transparent rounded-full animate-spin" />
                 ) : (
-                  "Generate Caption"
+                  "CRAFT CONTENT"
                 )}
               </button>
-              {error && <p className="text-destructive mt-3 text-center font-medium animate-pulse">{error}</p>}
+              {error && <p className="text-destructive text-center text-xs font-bold uppercase mt-2">{error}</p>}
             </div>
-
           </div>
-        </div>
 
-        {/* Results Area - Appears below card */}
-        {caption && (
-          <div className="animate-in fade-in slide-in-from-bottom-8 duration-500">
-            <div className="bg-card border border-border rounded-2xl p-6 md:p-8 shadow-xl relative overflow-hidden group">
-              <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
-
-              <div className="flex justify-between items-start mb-6">
-                <div>
-                  <h3 className="text-xl font-bold text-foreground">Your Caption</h3>
-                  <p className="text-sm text-muted-foreground">Ready to post</p>
-                </div>
-                <CopyButton text={caption} />
+          {/* Template Gallery & Results */}
+          <div className="lg:col-span-8 space-y-10">
+            {/* Gallery Section */}
+            <div className="space-y-6">
+              <div className="flex justify-between items-center px-1">
+                <label className="text-sm font-black tracking-widest text-foreground uppercase">
+                  Select Blueprint
+                </label>
+                <span className="text-[10px] font-mono text-muted-foreground uppercase">
+                  {captionTemplates.length} Designs Loaded
+                </span>
               </div>
 
-              <textarea
-                className="w-full min-h-[120px] bg-transparent resize-none outline-none text-lg text-foreground/90 font-sans leading-relaxed"
-                value={caption}
-                onChange={(e) => setCaption(e.target.value)}
-                aria-label="Generated Caption"
-                readOnly
-              />
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {captionTemplates.map((t) => (
+                  <div
+                    key={t.id}
+                    onClick={() => setSelectedTemplateId(t.id)}
+                    className={`relative group cursor-pointer aspect-[3/4] rounded-3xl border-2 transition-all overflow-hidden ${selectedTemplateId === t.id
+                      ? "border-primary bg-primary/10 shadow-[0_0_30px_rgba(var(--primary),0.2)]"
+                      : "border-border bg-card/40 hover:border-primary/50"
+                      }`}
+                  >
+                    <div className="p-6 h-full flex flex-col justify-between">
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-start">
+                          <div
+                            className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest ${t.type === "system" ? "bg-secondary text-secondary-foreground" : "bg-primary/20 text-primary"
+                              }`}
+                          >
+                            {t.type}
+                          </div>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setPreviewTemplate(t);
+                            }}
+                            className="p-1.5 bg-background/50 rounded-lg hover:bg-background transition-colors text-muted-foreground hover:text-foreground"
+                          >
+                            👁️
+                          </button>
+                        </div>
+                        <h4 className="font-bold text-sm leading-tight text-foreground line-clamp-2">
+                          {t.name.toUpperCase()}
+                        </h4>
+                      </div>
+
+                      <div className="space-y-4">
+                        <div className="h-20 opacity-30 select-none">
+                          {t.structure ? (
+                            <div className="flex flex-col gap-1">
+                              {t.structure.split("→").map((_: string, i: number) => (
+                                <div key={i} className="w-full h-2 bg-foreground/20 rounded-full" style={{ width: `${Math.max(40, 100 - i * 15)}%` }} />
+                              ))}
+                            </div>
+                          ) : (
+                            <>
+                              <div className="w-full h-2 bg-foreground/20 rounded-full mb-2" />
+                              <div className="w-5/6 h-2 bg-foreground/20 rounded-full mb-2" />
+                              <div className="w-4/6 h-2 bg-foreground/20 rounded-full" />
+                            </>
+                          )}
+                        </div>
+                        {t.type === "user" && (
+                          <div className="flex gap-2">
+                            <button
+                              onClick={(e) => openEditModal(t, e)}
+                              className="flex-1 py-1.5 bg-background/50 text-[10px] font-black rounded-lg hover:bg-background"
+                            >
+                              EDIT
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                removeTemplate(t.id);
+                              }}
+                              className="px-2 py-1.5 bg-destructive/10 text-destructive text-[10px] font-black rounded-lg hover:bg-destructive/20"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {selectedTemplateId === t.id && (
+                      <div className="absolute top-2 right-2 w-4 h-4 bg-primary rounded-full border-2 border-background flex items-center justify-center text-[8px] text-primary-foreground font-black">
+                        ✓
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Results Section */}
+            {caption && (
+              <div className="animate-in fade-in slide-in-from-bottom-12 duration-700">
+                <div className="bg-card border-2 border-primary/30 rounded-[2.5rem] p-1 shadow-2xl overflow-hidden">
+                  <div className="bg-background rounded-[2.3rem] p-10 space-y-8">
+                    <div className="flex justify-between items-start">
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-black text-primary tracking-[0.3em] uppercase">Generated Output</span>
+                        <h3 className="text-3xl font-black text-foreground tracking-tighter">THE FINAL COPY</h3>
+                      </div>
+                      <CopyButton text={caption} />
+                    </div>
+
+                    <div className="relative group">
+                      <textarea
+                        className="w-full min-h-[120px] bg-muted/20 border border-border p-6 rounded-3xl outline-none text-xl text-foreground/90 font-medium leading-relaxed resize-none"
+                        value={caption}
+                        readOnly
+                      />
+                      <div className="absolute top-4 right-4 text-[10px] font-mono text-muted-foreground opacity-50 uppercase">
+                        Mistral-7B Optimized
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Template Create/Edit Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/90 backdrop-blur-xl">
+          <div className="bg-card border-4 border-border w-full max-w-2xl rounded-[3rem] shadow-3xl p-12 space-y-10 animate-in zoom-in-95 duration-300">
+            <div className="space-y-2">
+              <h3 className="text-4xl font-black text-foreground tracking-tighter uppercase">
+                {editingTemplate ? "Refine Design" : "New Blueprint"}
+              </h3>
+              <p className="text-muted-foreground font-mono text-xs uppercase tracking-widest">
+                Define the logic for your content generation
+              </p>
+            </div>
+
+            <div className="space-y-8">
+              <div className="space-y-3">
+                <label className="text-xs font-black uppercase text-muted-foreground ml-1 tracking-widest">Template Identifier</label>
+                <input
+                  type="text"
+                  className="w-full p-5 bg-background border-2 border-border rounded-2xl text-xl font-bold focus:border-primary transition-all"
+                  placeholder="e.g. THOUGHT LEADERSHIP (LINKEDIN)"
+                  value={modalName}
+                  onChange={(e) => setModalName(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-3">
+                <label className="text-xs font-black uppercase text-muted-foreground ml-1 tracking-widest">Visual Structure Preview</label>
+                <input
+                  type="text"
+                  className="w-full p-5 bg-background border-2 border-border rounded-2xl text-lg font-bold focus:border-primary transition-all"
+                  placeholder="e.g. Hook → Value Proposition → CTA"
+                  value={modalStructure}
+                  onChange={(e) => setModalStructure(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex justify-between items-end">
+                  <label className="text-xs font-black uppercase text-muted-foreground ml-1 tracking-widest">AI Prompt Logic</label>
+                  <span className="text-[10px] font-mono text-primary bg-primary/10 px-2 py-1 rounded">{"{{inputText}}"} is required</span>
+                </div>
+                <textarea
+                  className="w-full min-h-[200px] p-6 bg-background border-2 border-border rounded-2xl text-lg font-medium resize-none focus:border-primary transition-all leading-relaxed"
+                  placeholder="Example: Act as a high-status founder. Craft a post about {{inputText}}..."
+                  value={modalContent}
+                  onChange={(e) => setModalContent(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-6">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="flex-1 py-5 bg-muted/20 border-2 border-border rounded-2xl font-black uppercase tracking-tighter hover:bg-muted/40 transition-all"
+              >
+                DISCARD
+              </button>
+              <button
+                onClick={handleSaveTemplate}
+                className="flex-1 py-5 bg-foreground text-background rounded-2xl font-black uppercase tracking-tighter hover:scale-105 transition-all shadow-xl"
+              >
+                SAVE DESIGN
+              </button>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* Preview Modal */}
+      {previewTemplate && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/90 backdrop-blur-md">
+          <div className="bg-card border border-border w-full max-w-xl rounded-[2.5rem] shadow-2xl p-10 space-y-8">
+            <div className="flex justify-between items-center border-b border-border pb-6">
+              <h3 className="text-2xl font-black text-foreground tracking-tighter uppercase">{previewTemplate.name}</h3>
+              <div className="px-3 py-1 bg-primary/10 text-primary text-[10px] font-black rounded-full uppercase tracking-widest">
+                {previewTemplate.type}
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <label className="text-[10px] font-black text-muted-foreground tracking-widest uppercase opacity-70">Anticipated Content Layout</label>
+              <div className="p-8 bg-muted/30 rounded-[2rem] border-2 border-dashed border-border/50 text-foreground font-bold text-lg text-center flex flex-col gap-4">
+                {previewTemplate.structure.split("→").map((step: string, i: number) => (
+                  <div key={i} className="py-2 bg-background/50 rounded-xl border border-border/20 shadow-sm">
+                    {step.trim()}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <button
+              onClick={() => setPreviewTemplate(null)}
+              className="w-full py-4 bg-foreground text-background rounded-2xl font-black uppercase tracking-tighter hover:brightness-110 active:scale-[0.98] transition-all"
+            >
+              CLOSE PREVIEW
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
-
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(text);
@@ -178,14 +435,14 @@ function CopyButton({ text }: { text: string }) {
       console.error("Failed to copy:", err);
     }
   };
-
   return (
     <button
       type="button"
       onClick={handleCopy}
-      className="px-3 py-1 bg-secondary text-secondary-foreground rounded text-sm hover:opacity-80 transition min-w-[4rem]"
+      className={`px-8 py-4 rounded-full font-black text-sm tracking-tighter transition-all shadow-lg flex items-center gap-2 ${copied ? "bg-green-500 text-white" : "bg-foreground text-background hover:scale-105"
+        }`}
     >
-      {copied ? "Copied!" : "Copy"}
+      {copied ? "COPIED!" : "COPY COPY"}
     </button>
   );
 }

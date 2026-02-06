@@ -1,92 +1,10 @@
 {
   "id": "formal-letter",
   "name": "Formal Letter",
-  "type": "letter",
-  "tone": "formal",
-  "is_system_template": true,
-
-  "layout": [
-    {
-      "id": "sender_heading",
-      "label": "Sender Address",
-      "order": 1,
-      "section_type": "heading",
-      "content_source": "user_input",
-      "placeholder": "Your address",
-      "required": true,
-      "user_customizable": true
-    },
-    {
-      "id": "date",
-      "label": "Date",
-      "order": 2,
-      "section_type": "date",
-      "content_source": "static",
-      "rules": ["Use today's date in formal format"]
-    },
-    {
-      "id": "receiver_heading",
-      "label": "Receiver Address",
-      "order": 3,
-      "section_type": "heading",
-      "content_source": "user_input",
-      "placeholder": "Receiver's address",
-      "required": true
-    },
-    {
-      "id": "subject",
-      "label": "Subject",
-      "order": 4,
-      "section_type": "title",
-      "content_source": "user_input",
-      "placeholder": "Subject of the letter",
-      "required": true
-    },
-    {
-      "id": "salutation",
-      "label": "Salutation",
-      "order": 5,
-      "section_type": "paragraph",
-      "content_source": "static",
-      "rules": ["Use a formal salutation like 'Respected Sir/Madam'"]
-    },
-    {
-      "id": "body",
-      "label": "Body",
-      "order": 6,
-      "section_type": "body",
-      "content_source": "ai_generated",
-      "rules": [
-        "Maintain formal tone",
-        "Be clear and concise",
-        "Use professional language"
-      ],
-      "required": true
-    },
-    {
-      "id": "closing",
-      "label": "Closing",
-      "order": 7,
-      "section_type": "paragraph",
-      "content_source": "static",
-      "rules": ["Use a formal closing like 'Yours sincerely'"]
-    },
-    {
-      "id": "signature",
-      "label": "Signature",
-      "order": 8,
-      "section_type": "signature",
-      "content_source": "user_input",
-      "placeholder": "Your name",
-      "required": true
-    }
-  ],
-
-  "global_rules": [
-    "Do not use casual language",
-    "Avoid emojis",
-    "Keep formatting professional"
-  ],
-
-  "prompt_instruction": "Generate a formal letter strictly following the provided layout and rules."
+  "category": "letter",
+  "structure": "Sender Info → Date → Recipient Info → Salutation → Formal Body → Closing",
+  "content": "You are a professional assistant. Write a formal letter based on the following details:\n\n{{inputText}}\n\nRules:\n- Maintain a professional and respectful tone.\n- Use standard letter formatting.\n- Be concise and clear.",
+  "type": "system",
+  "createdAt": "2026-02-06T10:00:00Z",
+  "updatedAt": "2026-02-06T10:00:00Z"
 }
