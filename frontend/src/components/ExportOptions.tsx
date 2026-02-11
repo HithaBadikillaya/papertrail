@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { jsPDF } from "jspdf";
 
 interface ExportOptionsProps {
@@ -9,6 +8,13 @@ interface ExportOptionsProps {
 
 export function ExportOptions({ content, filename = "document" }: ExportOptionsProps) {
     const [copied, setCopied] = useState(false);
+    const [canShare, setCanShare] = useState(false);
+
+    useEffect(() => {
+        if (typeof navigator !== 'undefined' && 'share' in navigator) {
+            setCanShare(true);
+        }
+    }, []);
 
     const handleCopy = async () => {
         try {
@@ -17,6 +23,17 @@ export function ExportOptions({ content, filename = "document" }: ExportOptionsP
             setTimeout(() => setCopied(false), 2000);
         } catch (err) {
             console.error("Failed to copy:", err);
+        }
+    };
+
+    const handleShare = async () => {
+        try {
+            await navigator.share({
+                title: filename,
+                text: content,
+            });
+        } catch (err) {
+            console.error("Error sharing:", err);
         }
     };
 
@@ -63,6 +80,16 @@ export function ExportOptions({ content, filename = "document" }: ExportOptionsP
             >
                 {copied ? "Copied!" : "Copy"}
             </button>
+
+            {canShare && (
+                <button
+                    type="button"
+                    onClick={handleShare}
+                    className="px-4 py-2 rounded-xl font-bold text-xs tracking-wider transition-all shadow-md flex items-center gap-2 uppercase bg-foreground text-background hover:scale-105"
+                >
+                    Share
+                </button>
+            )}
 
             <div className="flex gap-1 bg-muted/20 p-1 rounded-xl">
                 <button
