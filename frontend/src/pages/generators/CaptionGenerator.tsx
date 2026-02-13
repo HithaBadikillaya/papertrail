@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { generateCaption } from "../../services/captionApi";
 import { useTemplates } from "../../hook/useTemplate";
 import type { Template } from "../../services/captionApi";
+import { ExportOptions } from "../../components/ExportOptions";
 
 export default function CaptionGenerator() {
   const { templates, addTemplate, removeTemplate, editTemplate, loading: templatesLoading } = useTemplates();
@@ -298,7 +299,7 @@ export default function CaptionGenerator() {
                         <span className="text-[10px] font-black text-primary tracking-[0.3em] uppercase">All done!</span>
                         <h4 className="text-3xl font-black text-foreground tracking-tighter">Here's your caption</h4>
                       </div>
-                      <CopyButton text={caption} />
+                      <ExportOptions content={caption} filename="caption" />
                     </div>
 
                     <div className="relative group">
@@ -459,29 +460,6 @@ export default function CaptionGenerator() {
         </div>
       )}
     </div>
-  );
-}
-
-function CopyButton({ text }: { text: string }) {
-  const [copied, setCopied] = useState(false);
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error("Failed to copy:", err);
-    }
-  };
-  return (
-    <button
-      type="button"
-      onClick={handleCopy}
-      className={`px-8 py-4 rounded-full font-black text-sm tracking-tighter transition-all shadow-lg flex items-center gap-2 ${copied ? "bg-green-500 text-white" : "bg-foreground text-background hover:scale-105"
-        }`}
-    >
-      {copied ? "COPIED!" : "COPY"}
-    </button>
   );
 }
 
