@@ -1,10 +1,18 @@
 import fs from "fs";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // FOLDER PATHS
-const USER_TEMPLATE_DIR = path.join(process.cwd(), "src", "templates", "user");
-const SYSTEM_TEMPLATE_DIR = path.join(process.cwd(), "src", "templates", "system");
+const TEMPLATE_BASE_DIR = path.resolve(__dirname, "..", "templates");
+const USER_TEMPLATE_DIR = path.join(TEMPLATE_BASE_DIR, "user");
+const SYSTEM_TEMPLATE_DIR = path.join(TEMPLATE_BASE_DIR, "system");
+
+console.log(`[TemplateService] System templates: ${SYSTEM_TEMPLATE_DIR} (exists: ${fs.existsSync(SYSTEM_TEMPLATE_DIR)})`);
+console.log(`[TemplateService] User templates: ${USER_TEMPLATE_DIR} (exists: ${fs.existsSync(USER_TEMPLATE_DIR)})`);
 
 // HELPERS
 function ensureDirExists(dir) {
