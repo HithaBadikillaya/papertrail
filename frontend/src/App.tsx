@@ -4,6 +4,7 @@ import "./index.css";
 import Home from "./pages/Home";
 import CaptionGenerator from "./pages/generators/CaptionGenerator";
 import LetterGenerator from "./pages/generators/LetterGenerator";
+import MoMGenerator from "./pages/generators/MoMGenerator";
 
 function Main() {
   return (
@@ -15,6 +16,9 @@ function Main() {
 
         {/* Letter Generator */}
         <Route path="/letters" element={<LetterGenerator />} />
+
+        {/* Minutes of Meeting Generator */}
+        <Route path="/mom" element={<MoMGenerator />} />
 
         {/* Redirect old routes */}
         <Route path="/templates" element={<Navigate to="/captions" replace />} />
