@@ -5,6 +5,7 @@ import captionRoutes from "./routes/caption.routes.js";
 import letterRoutes from "./routes/letter.routes.js";
 import momRoutes from "./routes/mom.routes.js";
 import { validateFfprobe } from "./services/mediaProcessor.js";
+import { cleanupUploads, startPeriodicCleanup } from "./services/cleanup.service.js";
 
 dotenv.config();
 
@@ -43,14 +44,12 @@ app.use("/api/captions", captionRoutes);
 app.use("/api/letters", letterRoutes);
 app.use("/api/mom", momRoutes);
 
-// ---------------------------------------------------------------------------
-// Startup
-// ---------------------------------------------------------------------------
-
 async function start() {
   // Validate external tool availability before accepting requests
   try {
     await validateFfprobe();
+    await cleanupUploads();
+    startPeriodicCleanup();
   } catch (err) {
     console.error(err.message);
     process.exit(1);

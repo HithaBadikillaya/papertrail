@@ -6,6 +6,7 @@ import { extractAndNormalizeAudio, splitAudioIntoChunks } from "../services/medi
 import { transcribeChunks } from "../services/whisperService.js";
 import { createJob, getJob, updateJob, enqueue } from "../services/jobManager.js";
 import { generateMoM } from "../services/momService.js";
+import { cleanupJobFiles } from "../services/cleanup.service.js";
 import {
     getAllTemplates,
     getTemplateById,
@@ -161,16 +162,7 @@ async function processMediaJob(jobId, originalFilePath) {
             error: err.message,
         });
     } finally {
-        // Cleanup: original upload + temp job directory 
-        try {
-            if (fs.existsSync(originalFilePath)) {
-                await fs.promises.rm(originalFilePath, { force: true });
-            }
-        } catch (_) { /* best-effort */ }
-
-        try {
-            await fs.promises.rm(jobDir, { recursive: true, force: true });
-        } catch (_) { /* best-effort */ }
+        await cleanupJobFiles(jobId, originalFilePath);
     }
 }
 
