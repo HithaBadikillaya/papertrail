@@ -2,20 +2,19 @@
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "framer-motion";
 import { useState, useRef } from "react";
 
-// Simplified "Flow" Steps
 const steps = [
     {
         id: 1,
         title: "1. The Skeleton",
         subtitle: "Structure First",
-        description: "Every great document starts with a strong backbone. Choose a template layout that fits your needs—whether it's a formal letter or a punchy social post.",
+        description: "Every great document starts with a strong backbone. Choose a template layout that fits your needs - whether it's a formal letter or a punchy social post.",
         visualType: "skeleton"
     },
     {
         id: 2,
         title: "2. The Spark",
         subtitle: "Your Raw Ideas",
-        description: "Don't worry about phrasing. Just pour your raw, messy thoughts into the input field. Bullet points, brain dumps, or keywords—we take it all.",
+        description: "Don't worry about phrasing. Just pour your raw, messy thoughts into the input field. Bullet points, brain dumps, or keywords - we take it all.",
         visualType: "spark"
     },
     {
@@ -71,7 +70,6 @@ export default function TemplateUsageGuide() {
                 }}
             />
 
-            {/* Header: Visible on Mobile (Scrolls away), Hidden on Desktop */}
             <div className="container mx-auto px-6 pt-24 pb-8 text-center relative z-10 lg:hidden">
                 <h2 className="text-4xl md:text-6xl font-zilla font-bold text-foreground mb-4">
                     How does it work?
@@ -109,7 +107,7 @@ export default function TemplateUsageGuide() {
                                         key={activeStep}
                                         initial={{ opacity: 0, x: -20 }}
                                         animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: 20 }} // Slide out/in
+                                        exit={{ opacity: 0, x: 20 }}
                                         transition={{ duration: 0.4 }}
                                         className="space-y-4"
                                     >

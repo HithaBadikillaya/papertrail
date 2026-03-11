@@ -1,102 +1,363 @@
 "use client";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { useEffect } from "react";
+import { motion } from "framer-motion";
+import { useRef } from "react";
 import FeatureCards from "../components/FeatureCards";
 import Footer from "../components/Footer";
+import TemplateUsageGuide from "../components/TemplateUsageGuide";
 
+/* ───────────────────────────────────────────────
+   Palette constants (from logo tile analysis)
+   ─────────────────────────────────────────────── */
+const TERRACOTTA = "var(--color-retro-terracotta)";
+const CRIMSON = "var(--color-retro-crimson)";
+const INK = "var(--color-retro-ink)";
+const LINEN = "var(--color-retro-linen)";
+const PARCHMENT = "var(--color-retro-parchment)";
+const SAND = "var(--color-retro-sand)";
+const KHAKI = "var(--color-retro-khaki)";
+
+/* ───────────────────────────────────────────────
+   Ruled paper horizontal lines (decorative)
+   ─────────────────────────────────────────────── */
+function RuledLines({ count = 8 }: { count?: number }) {
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden>
+      {Array.from({ length: count }).map((_, i) => (
+        <div
+          key={i}
+          className="absolute w-full h-px"
+          style={{
+            top: `${(i + 1) * (100 / (count + 1))}%`,
+            backgroundColor: SAND,
+            opacity: 0.4,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+/* ───────────────────────────────────────────────
+   Typewriter metadata line component
+   ─────────────────────────────────────────────── */
+function MetaLine({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em]">
+      <span style={{ color: SAND }}>{label}</span>
+      <span className="w-8 h-px" style={{ backgroundColor: SAND }} />
+      <span style={{ color: INK, fontWeight: 700 }}>{value}</span>
+    </div>
+  );
+}
+
+/* ───────────────────────────────────────────────
+   Stamp badge
+   ─────────────────────────────────────────────── */
+function StampBadge({ children, rotate = 0 }: { children: React.ReactNode; rotate?: number }) {
+  return (
+    <div
+      className="inline-block px-4 py-1.5 border-2 font-mono font-bold text-[9px] uppercase tracking-[0.3em]"
+      style={{
+        borderColor: TERRACOTTA,
+        color: TERRACOTTA,
+        transform: `rotate(${rotate}deg)`,
+        boxShadow: `1px 1px 0 ${TERRACOTTA}`,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+/* ───────────────────────────────────────────────
+   Hero Section
+   ─────────────────────────────────────────────── */
 function HeroSection() {
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  // Smooth out the mouse tracking
-  const springConfig = { damping: 25, stiffness: 150 };
-  const dx = useSpring(mouseX, springConfig);
-  const dy = useSpring(mouseY, springConfig);
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      mouseX.set(e.clientX);
-      mouseY.set(e.clientY);
-    };
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [mouseX, mouseY]);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   return (
-    <section className="relative h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-background">
-      {/* Dynamic Glow Layer */}
-      <motion.div
-        className="pointer-events-none absolute inset-0 z-0 opacity-30"
-        style={{
-          background: useTransform(
-            [dx, dy],
-            ([x, y]) => `radial-gradient(600px circle at ${x}px ${y}px, rgba(var(--primary-rgb), 0.15), transparent)`
-          ),
-        }}
+    <section
+      ref={containerRef}
+      className="relative w-full min-h-screen overflow-hidden"
+      style={{ backgroundColor: LINEN }}
+    >
+      {/* Ruled paper lines */}
+      <RuledLines count={14} />
+
+      {/* Left margin rule (classic notebook) */}
+      <div
+        className="absolute top-0 left-24 w-px h-full"
+        style={{ backgroundColor: TERRACOTTA, opacity: 0.25 }}
+        aria-hidden
       />
 
-      <div className="relative z-10 text-center space-y-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, ease: "easeOut" }}
-        >
-          {/* Interactive SVG Title */}
-          <svg className="w-full max-w-4xl px-6 select-none" viewBox="0 0 800 200">
-            <defs>
-              <mask id="textMask">
-                <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" className="font-amarna font-bold text-[180px] fill-white">
-                  D.A.S.H
-                </text>
-              </mask>
-            </defs>
-
-            {/* Base Text */}
-            <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" className="font-amarna font-bold text-[180px] fill-transparent stroke-muted/20 stroke-[1px]">
-              D.A.S.H
-            </text>
-
-            {/* Gradient Reveal */}
-            <motion.rect
-              mask="url(#textMask)"
-              width="100%"
-              height="100%"
-              className="fill-primary"
-              style={{
-                x: useTransform(dx, [0, 2000], [-100, 100]),
-              }}
-            />
-          </svg>
-        </motion.div>
-
-        <motion.h3
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 1 }}
-          className="text-2xl font-indie text-secondary tracking-widest"
-        >
-          &gt; Document And Social Hub
-        </motion.h3>
+      {/* Top "page number" bar */}
+      <div
+        className="absolute top-0 left-0 w-full flex justify-between items-center px-8 py-3 z-10 border-b"
+        style={{ borderColor: `${SAND}88`, backgroundColor: `${PARCHMENT}CC` }}
+      >
+        <span className="font-mono text-[9px] uppercase tracking-[0.25em]" style={{ color: KHAKI }}>
+          Papertrail · Archive System · PT-2026-A
+        </span>
+        <div className="flex items-center gap-4">
+          <MetaLine label="Status" value="Active" />
+          <MetaLine label="Class" value="Open Source" />
+        </div>
       </div>
 
+      {/* ── MAIN EDITORIAL GRID ── */}
+      <div className="relative z-20 max-w-[1400px] mx-auto px-6 pt-28 pb-20">
+
+        {/* Row 1: Logo images + heading */}
+        <div className="grid grid-cols-12 gap-4 items-start mb-6">
+
+          {/* Column 1: First logo image – large */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            className="col-span-12 md:col-span-5 lg:col-span-4 relative overflow-hidden min-h-[200px] md:min-h-[280px]"
+            style={{ border: `2px solid ${INK}` }}
+          >
+            <img
+              src="/assets/typo1.jpg"
+              alt="Papertrail - collage typography logotype"
+              className="w-full h-full object-cover min-h-[200px] md:min-h-[280px]"
+              style={{ filter: "contrast(1.05) saturate(0.95)" }}
+            />
+            {/* Overlay corner stamp */}
+            <div className="absolute top-3 left-3">
+              <StampBadge rotate={-3}>Archival</StampBadge>
+            </div>
+          </motion.div>
+
+          {/* Column 2: Giant title block */}
+          <motion.div
+            initial={{ opacity: 0, x: 24 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+            className="col-span-12 md:col-span-7 lg:col-span-8 flex flex-col justify-between min-h-0 md:min-h-[280px]"
+          >
+            {/* Section label */}
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-6 h-px" style={{ backgroundColor: TERRACOTTA }} />
+              <span className="font-mono text-[9px] uppercase tracking-[0.3em]" style={{ color: TERRACOTTA }}>
+                Documentation Engine · v2.0
+              </span>
+            </div>
+
+            {/* Giant display heading */}
+            <div className="relative">
+              <h1
+                className="font-zilla leading-[0.88] tracking-tighter select-none"
+                style={{
+                  fontSize: "clamp(64px, 11vw, 152px)",
+                  color: INK,
+                  fontWeight: 700,
+                }}
+              >
+                PAPER
+                <br />
+                <span style={{ color: TERRACOTTA }}>TRAIL</span>
+                <span
+                  className="inline-block w-[3px] ml-1"
+                  style={{
+                    height: "0.85em",
+                    backgroundColor: TERRACOTTA,
+                    verticalAlign: "text-bottom",
+                    animation: "blinkCaret 1s step-end infinite",
+                  }}
+                />
+              </h1>
+
+              {/* Highlight bar behind "TRAIL" */}
+              <motion.div
+                initial={{ scaleX: 0, originX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ delay: 0.8, duration: 1.0, ease: "circOut" }}
+                className="absolute pointer-events-none"
+                style={{
+                  bottom: "12%",
+                  left: 0,
+                  width: "55%",
+                  height: "18%",
+                  backgroundColor: `${SAND}60`,
+                  zIndex: -1,
+                }}
+              />
+            </div>
+
+            {/* Tagline */}
+            <p
+              className="mt-6 font-mono text-sm leading-relaxed max-w-lg"
+              style={{ color: KHAKI }}
+            >
+              Turn audio, video, and conversations into precise written documents
+              - captions, letters, meeting minutes - no accounts, no lock-in.
+            </p>
+          </motion.div>
+        </div>
+
+        {/* Row 2: Metadata strip + second image + CTA */}
+        <div className="grid grid-cols-12 gap-4 items-stretch">
+
+          {/* Meta block */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25, duration: 0.6 }}
+            className="col-span-12 md:col-span-3 flex flex-col justify-between p-5"
+            style={{
+              border: `1px solid ${SAND}`,
+              backgroundColor: PARCHMENT,
+              borderLeft: `3px solid ${TERRACOTTA}`,
+            }}
+          >
+            <div className="space-y-3">
+              <p className="font-mono text-[9px] uppercase tracking-[0.3em]" style={{ color: KHAKI }}>
+                Archive Index
+              </p>
+              <div className="space-y-2">
+                <MetaLine label="Ref" value="PT-ARC-26" />
+                <MetaLine label="Type" value="Class A" />
+                <MetaLine label="Build" value="2.0.0" />
+                <MetaLine label="Host" value="Self" />
+                <MetaLine label="License" value="Open" />
+              </div>
+            </div>
+            <div className="mt-5 flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-green-500" style={{ animation: "pulse 2s infinite" }} />
+              <span className="font-mono text-[9px] uppercase tracking-[0.2em]" style={{ color: INK }}>
+                Archive Ready
+              </span>
+            </div>
+          </motion.div>
+
+          {/* Second logo image */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35, duration: 0.6 }}
+            className="col-span-12 md:col-span-4 relative overflow-hidden min-h-[160px] md:min-h-[240px]"
+            style={{ border: `2px solid ${INK}` }}
+          >
+            <img
+              src="/assets/typo2.jpg"
+              alt="Papertrail - alternate collage logotype"
+              className="w-full h-full object-cover min-h-[160px] md:min-h-[240px]"
+              style={{ filter: "contrast(1.02) saturate(0.98)" }}
+            />
+            {/* Diagonal overlay text */}
+            <div
+              className="absolute bottom-4 right-4"
+              style={{ transform: "rotate(3deg)" }}
+            >
+              <StampBadge rotate={3}>Open Source</StampBadge>
+            </div>
+          </motion.div>
+
+          {/* CTA + description block */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.45, duration: 0.6 }}
+            className="col-span-12 md:col-span-5 flex flex-col justify-between p-6"
+            style={{ backgroundColor: INK }}
+          >
+            <div>
+              <p
+                className="font-mono text-[9px] uppercase tracking-[0.25em] mb-3"
+                style={{ color: SAND }}
+              >
+                Archival Integrity
+              </p>
+              <p
+                className="font-zilla text-lg leading-relaxed"
+                style={{ color: PARCHMENT }}
+              >
+                Procedural generation and automated transcription ensure every
+                sync, meeting, and milestone is captured with{" "}
+                <em style={{ color: TERRACOTTA }}>surgical precision</em>.
+                Papertrail is the evolutionary history of your work.
+              </p>
+            </div>
+
+            <div className="mt-8 flex flex-col sm:flex-row gap-3">
+              <a
+                href="/captions"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 font-mono text-[10px] uppercase tracking-[0.25em] font-bold transition-all duration-200"
+                style={{
+                  backgroundColor: TERRACOTTA,
+                  color: PARCHMENT,
+                  border: `1px solid ${TERRACOTTA}`,
+                }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLAnchorElement).style.backgroundColor = CRIMSON;
+                  (e.currentTarget as HTMLAnchorElement).style.borderColor = CRIMSON;
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLAnchorElement).style.backgroundColor = TERRACOTTA;
+                  (e.currentTarget as HTMLAnchorElement).style.borderColor = TERRACOTTA;
+                }}
+              >
+                Begin Archive ↗
+              </a>
+              <a
+                href="#tools"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 font-mono text-[10px] uppercase tracking-[0.25em] font-bold transition-all duration-200"
+                style={{
+                  backgroundColor: "transparent",
+                  color: PARCHMENT,
+                  border: `1px solid ${SAND}55`,
+                }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLAnchorElement).style.borderColor = PARCHMENT;
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLAnchorElement).style.borderColor = `${SAND}55`;
+                }}
+              >
+                View Index ↓
+              </a>
+            </div>
+          </motion.div>
+        </div>
+
+      </div>
+
+      {/* Scroll indicator */}
       <motion.div
-        animate={{ y: [0, 10, 0] }}
-        transition={{ repeat: Infinity, duration: 2 }}
-        className="absolute bottom-10 font-mono text-xs text-muted-foreground uppercase tracking-[0.3em]"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.6 }}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-20"
       >
-        Scroll to initialize
+        <div className="w-px h-12" style={{ background: `linear-gradient(to bottom, ${TERRACOTTA}, transparent)` }} />
+        <span className="font-mono text-[8px] uppercase tracking-[0.4em]" style={{ color: KHAKI }}>
+          Index Breakdown Below
+        </span>
       </motion.div>
+
+      <style>{`
+        @keyframes blinkCaret {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0; }
+        }
+      `}</style>
     </section>
   );
 }
 
-import TemplateUsageGuide from "../components/TemplateUsageGuide";
-
+/* ───────────────────────────────────────────────
+   Root page
+   ─────────────────────────────────────────────── */
 export default function Home() {
   return (
-    <main className="w-full bg-background min-h-screen">
+    <main className="w-full min-h-screen" style={{ backgroundColor: LINEN }}>
       <HeroSection />
-      <FeatureCards />
+      <div id="tools">
+        <FeatureCards />
+      </div>
       <TemplateUsageGuide />
       <Footer />
     </main>

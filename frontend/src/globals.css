@@ -32,15 +32,28 @@
   --radius-md: calc(0.5rem - 2px);
   --radius-sm: calc(0.5rem - 4px);
 
-  /* Retro Palette */
-  --color-retro-red: hsl(4 81% 73%);
-  --color-retro-green: hsl(136 41% 65%);
-  --color-retro-yellow: hsl(44 96% 69%);
-  --color-retro-blue: hsl(210 52% 78%);
-  --color-retro-cyan: hsl(188 28% 60%);
-  --color-retro-cream: hsl(40 100% 99%);
-  --color-retro-beige: hsl(35 47% 85%);
-  --color-retro-accent: hsl(0 46% 51%);
+  /* Brand Palette - Vintage Linen Collage (from logo assets) */
+  --color-retro-terracotta: #C4533A;
+  --color-retro-crimson: #8B2E2E;
+  --color-retro-linen: #EDE5D4;
+  --color-retro-ink: #1C1917;
+  --color-retro-slate: #4A6FA5;
+  --color-retro-khaki: #7D7348;
+  --color-retro-parchment: #F2EBD9;
+  --color-retro-sand: #D2C5A8;
+
+  /* Smoothed Footer Palette */
+  --color-footer-bg: #211D1A;
+  --color-footer-border: #3D352F;
+  /* Legacy aliases kept for any remaining usages */
+  --color-retro-red: #C4533A;
+  --color-retro-green: #3A8C4A;
+  --color-retro-yellow: #D4A017;
+  --color-retro-blue: #4A6FA5;
+  --color-retro-cyan: #7EACB5;
+  --color-retro-cream: #F2EBD9;
+  --color-retro-beige: #D2C5A8;
+  --color-retro-accent: #8B2E2E;
 }
 
 @layer base {

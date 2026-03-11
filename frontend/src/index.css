@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Anonymous+Pro:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Amarna:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Zilla+Slab:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
 
 
 @import "tailwindcss";
@@ -43,82 +43,73 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  --font-sekuya: 'Sekuya', sans-serif;
+  --font-sans: 'Special Elite', cursive; /* Ransom note/typewriter feel */
   --font-mono: 'Anonymous Pro', monospace;
   --font-indie: 'Indie Flower', cursive;
   --font-zilla: 'Zilla Slab', serif;
 
   /* specialized retro colors */
-  --color-retro-border: #BF4646;
-
-  /* fonts
-  --font-sans: "Inter", system-ui, sans-serif;
-  --font-display: "Righteous", sans-serif; */
+  --color-retro-border: #BF4646; /* Keeping this as it might fit a vintage theme */
 }
 
 :root {
-  --radius: 0.625rem;
+  --radius: 0.25rem; /* Sharper corners for a cut-out feel */
 
-  /* Custom Warm/Blue Palette */
-  --background: #FFF4EA;
-  --foreground: #2D3748;
-  /* Dark slate for readability on cream */
+  /* Vintage Ransom-Note Collage Palette */
+  --background: #FDF8E7; /* Light parchment/aged paper */
+  --foreground: #2C3E50; /* Dark ink blue-grey */
 
-  --card: #FFFFFF;
-  --card-foreground: #2D3748;
+  --card: #FFFFFF; /* Clean white for elements on top of paper */
+  --card-foreground: #2C3E50;
 
   --popover: #FFFFFF;
-  --popover-foreground: #2D3748;
+  --popover-foreground: #2C3E50;
 
-  --primary: #7EACB5;
-  /* The "next major color" (Blue shade) */
+  --primary: #C0392B; /* Muted, slightly desaturated red (like a stamp or highlight) */
   --primary-foreground: #FFFFFF;
 
-  --secondary: #EDDCC6;
-  /* Borders and Buttons */
-  --secondary-foreground: #2D3748;
+  --secondary: #BDC3C7; /* Light grey, like aged tape or paper texture */
+  --secondary-foreground: #2C3E50;
 
-  --muted: #F3E6D5;
-  /* A slightly darker shade of background */
-  --muted-foreground: #64748B;
+  --muted: #E0D8C7; /* Slightly darker paper tone */
+  --muted-foreground: #7F8C8D; /* Medium grey */
 
-  --accent: #E2E8F0;
-  --accent-foreground: #2D3748;
+  --accent: #F1C40F; /* A pop of muted yellow, like old glue or highlight */
+  --accent-foreground: #2C3E50;
 
-  --destructive: #EF4444;
-  --border: #EDDCC6;
-  /* Borders */
-  --input: #EDDCC6;
-  --ring: #7EACB5;
+  --destructive: #E74C3C; /* Standard red for errors */
+  --border: #BDC3C7;
+  --input: #BDC3C7;
+  --ring: #C0392B;
 }
 
 .dark {
-  /* Forcing Light Theme as requested (Global change) */
-  --background: #FFF4EA;
-  --foreground: #2D3748;
+  /* Forcing Light Theme as requested (Global change) - keeping the same palette for consistency */
+  --background: #FDF8E7;
+  --foreground: #2C3E50;
 
   --card: #FFFFFF;
-  --card-foreground: #2D3748;
+  --card-foreground: #2C3E50;
 
   --popover: #FFFFFF;
-  --popover-foreground: #2D3748;
+  --popover-foreground: #2C3E50;
 
-  --primary: #7EACB5;
+  --primary: #C0392B;
   --primary-foreground: #FFFFFF;
 
-  --secondary: #EDDCC6;
-  --secondary-foreground: #2D3748;
+  --secondary: #BDC3C7;
+  --secondary-foreground: #2C3E50;
 
-  --muted: #F3E6D5;
-  --muted-foreground: #64748B;
+  --muted: #E0D8C7;
+  --muted-foreground: #7F8C8D;
 
-  --accent: #E2E8F0;
-  --accent-foreground: #2D3748;
+  --accent: #F1C40F;
+  --accent-foreground: #2C3E50;
 
-  --destructive: #EF4444;
-  --border: #EDDCC6;
-  --input: #EDDCC6;
-  --ring: #7EACB5;
+  --destructive: #E74C3C;
+  --border: #BDC3C7;
+  --input: #BDC3C7;
+  --ring: #C0392B;
 }
 
 /* Base layer */
@@ -147,7 +138,7 @@
     -ms-overflow-style: none;
   }
 
-  /* Custom Animations for Redesign */
+  /* Custom Animations for Redesign - keeping existing general-purpose animations */
   .animate-pulse-slow {
     animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
