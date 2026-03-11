@@ -1,4 +1,4 @@
-![Papertrail Banner](frontend/public/assets/typo1.jpg)
+![Papertrail Banner](frontend/public/assets/banner.jpg)
 
 # Papertrail
 
