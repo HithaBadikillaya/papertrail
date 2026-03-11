@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { ExportOptions } from "../../components/ui/ExportOptions";
 
 interface ResultsDisplayProps {
     generatedMoM: string;
@@ -31,7 +31,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ generatedMoM, on
                             >
                                 {isExpanding ? "EXPANDING..." : "EXPAND"}
                             </button>
-                            <CopyButton text={generatedMoM} />
+                            <ExportOptions content={generatedMoM} filename="meeting_minutes" />
                         </div>
                     </div>
 
@@ -45,30 +45,5 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ generatedMoM, on
                 </div>
             </div>
         </div>
-    );
-};
-
-const CopyButton: React.FC<{ text: string }> = ({ text }) => {
-    const [copied, setCopied] = useState(false);
-
-    const handleCopy = async () => {
-        try {
-            await navigator.clipboard.writeText(text);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-        } catch (err) {
-            console.error("Failed to copy:", err);
-        }
-    };
-
-    return (
-        <button
-            type="button"
-            onClick={handleCopy}
-            className={`px-8 py-4 rounded-sm font-bold border-2 border-foreground transition-all shadow-[4px_4px_0_var(--color-retro-ink)] flex items-center gap-2 ${copied ? "bg-green-500 text-white" : "bg-foreground text-background hover:translate-x-[1px] hover:translate-y-[1px]"
-                }`}
-        >
-            {copied ? "COPIED!" : "COPY"}
-        </button>
     );
 };

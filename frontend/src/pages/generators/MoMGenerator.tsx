@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
     uploadAndTranscribe,
     generateMoM,
@@ -8,40 +8,35 @@ import {
     deleteMoMTemplate,
 } from "../../services/momApi";
 
-// Components
-import { MoMHeader } from "./mom/MoMHeader";
-import { FileUploadZone } from "./mom/FileUploadZone";
-import { MeetingDetails } from "./mom/MeetingDetails";
-import { TemplateGrid } from "./mom/TemplateGrid";
-import { ResultsDisplay } from "./mom/ResultsDisplay";
-import { TemplateManagementModal } from "./mom/TemplateManagementModal";
-import { PreviewModal } from "./mom/PreviewModal";
-import type { Template } from "./mom/types";
+// Shared Features
+import type { Template } from "../../features/shared/types";
+import { GeneratorPageLayout } from "../../features/shared/GeneratorPageLayout";
+import { TemplateGallery } from "../../features/shared/TemplateGallery";
+import { TemplateManagementModal } from "../../features/shared/TemplateManagementModal";
+import { PreviewModal } from "../../features/shared/PreviewModal";
+
+// MoM Specific Features
+import { FileUploadZone } from "../../features/mom/FileUploadZone";
+import { MeetingDetails } from "../../features/mom/MeetingDetails";
+import { ResultsDisplay } from "../../features/mom/ResultsDisplay";
 
 export default function MoMGenerator() {
-    // File upload state
     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
     const [isDragging, setIsDragging] = useState(false);
-
-    // Transcription state
     const [transcription, setTranscription] = useState("");
     const [isTranscribing, setIsTranscribing] = useState(false);
     const [transcriptionError, setTranscriptionError] = useState("");
     const [progress, setProgress] = useState(0);
 
-    // Generation state
     const [selectedTemplateId, setSelectedTemplateId] = useState("");
     const [meetingTitle, setMeetingTitle] = useState("");
     const [generatedMoM, setGeneratedMoM] = useState("");
     const [isGenerating, setIsGenerating] = useState(false);
     const [generationError, setGenerationError] = useState("");
 
-    // Template state
     const [templates, setTemplates] = useState<Template[]>([]);
     const [templatesLoading, setTemplatesLoading] = useState(true);
-    const [templatesError, setTemplatesError] = useState("");
 
-    // Modal states
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingTemplate, setEditingTemplate] = useState<Template | null>(null);
     const [modalName, setModalName] = useState("");
@@ -49,12 +44,10 @@ export default function MoMGenerator() {
     const [modalStructure, setModalStructure] = useState("");
     const [previewTemplate, setPreviewTemplate] = useState<Template | null>(null);
 
-    // Load templates on mount
     useEffect(() => {
         loadTemplates();
     }, []);
 
-    // Auto-select first template
     useEffect(() => {
         if (templates.length > 0 && !selectedTemplateId) {
             setSelectedTemplateId(templates[0].id);
@@ -64,13 +57,10 @@ export default function MoMGenerator() {
     const loadTemplates = async () => {
         try {
             setTemplatesLoading(true);
-            setTemplatesError("");
             const data = await getMoMTemplates();
-            console.log("MoM Templates loaded:", data);
             setTemplates(data as any);
         } catch (error: any) {
             console.error("Failed to load templates:", error);
-            setTemplatesError("Could not load templates. Check backend connection.");
         } finally {
             setTemplatesLoading(false);
         }
@@ -82,17 +72,6 @@ export default function MoMGenerator() {
             setTranscriptionError("File size exceeds 4GB limit");
             return;
         }
-
-        const allowedTypes = [
-            "audio/mpeg", "audio/mp3", "audio/mp4", "audio/m4a", "audio/wav",
-            "audio/webm", "audio/flac", "video/mp4", "video/webm", "video/mpeg", "video/quicktime"
-        ];
-
-        if (!allowedTypes.includes(file.type)) {
-            setTranscriptionError("Invalid file type. Please upload audio/video files only.");
-            return;
-        }
-
         setUploadedFile(file);
         setTranscriptionError("");
         handleTranscribe(file);
@@ -102,7 +81,6 @@ export default function MoMGenerator() {
         setIsTranscribing(true);
         setTranscriptionError("");
         setProgress(0);
-
         try {
             const transcriptText = await uploadAndTranscribe(file, (_msg, pct) => {
                 setProgress(pct);
@@ -112,7 +90,6 @@ export default function MoMGenerator() {
             setGeneratedMoM("");
             setTimeout(() => setProgress(0), 1000);
         } catch (error: any) {
-            setProgress(0);
             setTranscriptionError(error.message || "Transcription failed");
             setUploadedFile(null);
         } finally {
@@ -141,10 +118,6 @@ export default function MoMGenerator() {
         }
     };
 
-    const handleExpand = () => {
-        handleGenerate("longer", generatedMoM);
-    };
-
     const handleSaveTemplate = async () => {
         if (!modalName.trim() || !modalContent.trim()) return;
         try {
@@ -168,8 +141,7 @@ export default function MoMGenerator() {
         }
     };
 
-    const handleDeleteTemplate = async (id: string, e: React.MouseEvent) => {
-        e.stopPropagation();
+    const handleDeleteTemplate = async (id: string) => {
         try {
             await deleteMoMTemplate(id);
             await loadTemplates();
@@ -178,72 +150,72 @@ export default function MoMGenerator() {
         }
     };
 
+    const presets = [
+        { label: "Standard Meeting", structure: "Title + Date + Attendees + Agenda + Decisions + Actions", content: "Generate comprehensive meeting minutes from: {{transcriptText}}" },
+        { label: "Client Call", structure: "Client Info + Purpose + Discussion + Agreements + Follow-up", content: "Create professional client meeting notes from: {{transcriptText}}" },
+        { label: "Tech Sync", structure: "Sprint Info + Technical Updates + Blockers + Tasks", content: "Document this technical session: {{transcriptText}}" }
+    ];
+
     return (
-        <div className="min-h-screen bg-background flex flex-col items-center p-4 md:p-10 relative overflow-y-auto">
-            <div className="fixed top-0 right-0 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[120px] pointer-events-none opacity-50" />
-            <div className="fixed bottom-0 left-0 w-[600px] h-[600px] bg-secondary/20 rounded-full blur-[120px] pointer-events-none opacity-50" />
+        <GeneratorPageLayout
+            title="Minutes of Meeting"
+            subtitle="Automated high-fidelity transcription"
+            onNewTemplate={() => {
+                setEditingTemplate(null);
+                setModalName("");
+                setModalContent("");
+                setModalStructure("");
+                setIsModalOpen(true);
+            }}
+        >
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <TemplateGallery
+                    templates={templates}
+                    selectedTemplateId={selectedTemplateId}
+                    setSelectedTemplateId={setSelectedTemplateId}
+                    onPreview={setPreviewTemplate}
+                    onEdit={(template, e) => {
+                        e.stopPropagation();
+                        setEditingTemplate(template);
+                        setModalName(template.name);
+                        setModalContent(template.content);
+                        setModalStructure(template.structure);
+                        setIsModalOpen(true);
+                    }}
+                    onRemove={handleDeleteTemplate}
+                    label="1. Document Protocol"
+                />
 
-            <div className="relative z-10 w-full max-w-6xl space-y-10 mt-6 pb-20">
-                <MoMHeader onNewTemplate={() => {
-                    setEditingTemplate(null);
-                    setModalName("");
-                    setModalContent("");
-                    setModalStructure("");
-                    setIsModalOpen(true);
-                }} />
+                <div className="lg:col-span-8 space-y-10">
+                    <FileUploadZone
+                        uploadedFile={uploadedFile}
+                        isDragging={isDragging}
+                        onDrop={(e) => { e.preventDefault(); setIsDragging(false); const f = e.dataTransfer.files[0]; if (f) handleFileSelect(f); }}
+                        onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                        onDragLeave={() => setIsDragging(false)}
+                        onFileSelect={handleFileSelect}
+                        isTranscribing={isTranscribing}
+                        progress={progress}
+                        transcriptionError={transcriptionError}
+                        transcription={transcription}
+                    />
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                    <div className="lg:col-span-4">
-                        <TemplateGrid
-                            templates={templates}
-                            selectedTemplateId={selectedTemplateId}
-                            setSelectedTemplateId={setSelectedTemplateId}
-                            setPreviewTemplate={setPreviewTemplate}
-                            templatesLoading={templatesLoading}
-                            templatesError={templatesError}
-                            openEditModal={(template, e) => {
-                                e.stopPropagation();
-                                setEditingTemplate(template);
-                                setModalName(template.name);
-                                setModalContent(template.content);
-                                setModalStructure(template.structure);
-                                setIsModalOpen(true);
-                            }}
-                            handleDeleteTemplate={handleDeleteTemplate}
-                        />
-                    </div>
+                    <MeetingDetails
+                        transcription={transcription}
+                        meetingTitle={meetingTitle}
+                        setMeetingTitle={setMeetingTitle}
+                        handleGenerate={() => handleGenerate()}
+                        isGenerating={isGenerating}
+                        selectedTemplateId={selectedTemplateId}
+                        templatesLoading={templatesLoading}
+                        generationError={generationError}
+                    />
 
-                    <div className="lg:col-span-8 space-y-10">
-                        <FileUploadZone
-                            uploadedFile={uploadedFile}
-                            isDragging={isDragging}
-                            onDrop={(e) => { e.preventDefault(); setIsDragging(false); const f = e.dataTransfer.files[0]; if (f) handleFileSelect(f); }}
-                            onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-                            onDragLeave={() => setIsDragging(false)}
-                            onFileSelect={handleFileSelect}
-                            isTranscribing={isTranscribing}
-                            progress={progress}
-                            transcriptionError={transcriptionError}
-                            transcription={transcription}
-                        />
-
-                        <MeetingDetails
-                            transcription={transcription}
-                            meetingTitle={meetingTitle}
-                            setMeetingTitle={setMeetingTitle}
-                            handleGenerate={() => handleGenerate()}
-                            isGenerating={isGenerating}
-                            selectedTemplateId={selectedTemplateId}
-                            templatesLoading={templatesLoading}
-                            generationError={generationError}
-                        />
-
-                        <ResultsDisplay
-                            generatedMoM={generatedMoM}
-                            onExpand={handleExpand}
-                            isExpanding={isGenerating}
-                        />
-                    </div>
+                    <ResultsDisplay
+                        generatedMoM={generatedMoM}
+                        onExpand={() => handleGenerate("longer", generatedMoM)}
+                        isExpanding={isGenerating}
+                    />
                 </div>
             </div>
 
@@ -258,12 +230,15 @@ export default function MoMGenerator() {
                 modalStructure={modalStructure}
                 setModalStructure={setModalStructure}
                 handleSaveTemplate={handleSaveTemplate}
+                presets={presets}
+                title="Protocol"
+                injectionPointLabel="{{transcriptText}}"
             />
 
             <PreviewModal
                 template={previewTemplate}
                 onClose={() => setPreviewTemplate(null)}
             />
-        </div>
+        </GeneratorPageLayout>
     );
 }

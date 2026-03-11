@@ -83,7 +83,7 @@ export default function Footer() {
           {/* Spacer */}
           <div className="hidden md:block md:col-span-1" />
 
-          {/* Index / Quick links */}
+          {/* Quick links */}
           <nav className="md:col-span-3 space-y-4" aria-label="Papertrail tools index">
             <h3
               className="font-mono font-bold text-[9px] uppercase tracking-[0.3em] pb-2 border-b"
