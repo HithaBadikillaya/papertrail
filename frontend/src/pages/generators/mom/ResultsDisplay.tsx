@@ -11,14 +11,14 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ generatedMoM, on
 
     return (
         <div className="animate-in fade-in slide-in-from-bottom-12 duration-700">
-            <div className="bg-card border-2 border-primary/30 rounded-[2.5rem] p-1 shadow-2xl overflow-hidden">
-                <div className="bg-background rounded-[2.3rem] p-10 space-y-8">
+            <div className="bg-card border-2 border-foreground p-1 shadow-[8px_8px_0_var(--color-primary)] overflow-hidden">
+                <div className="bg-background p-10 space-y-8">
                     <div className="flex justify-between items-start">
                         <div className="space-y-1">
-                            <span className="text-[10px] font-black text-primary tracking-[0.3em] uppercase">
+                            <span className="text-[10px] font-semibold text-primary tracking-[0.3em] uppercase">
                                 All done!
                             </span>
-                            <h4 className="text-3xl font-black text-foreground tracking-tighter">
+                            <h4 className="text-3xl font-bold text-foreground tracking-tight">
                                 Your Meeting Minutes
                             </h4>
                         </div>
@@ -27,7 +27,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ generatedMoM, on
                                 type="button"
                                 onClick={onExpand}
                                 disabled={isExpanding}
-                                className="px-8 py-4 rounded-full font-black text-sm tracking-tighter transition-all shadow-lg flex items-center gap-2 bg-primary/10 text-primary border-2 border-primary/20 hover:bg-primary/20 hover:scale-105 disabled:opacity-50 disabled:scale-100"
+                                className="px-8 py-4 rounded-sm font-bold text-sm tracking-tight transition-all border-2 border-foreground shadow-[4px_4px_0_var(--color-retro-ink)] bg-primary/10 text-primary hover:translate-x-[1px] hover:translate-y-[1px] disabled:opacity-50"
                             >
                                 {isExpanding ? "EXPANDING..." : "EXPAND"}
                             </button>
@@ -37,7 +37,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ generatedMoM, on
 
                     <div className="relative group">
                         <textarea
-                            className="w-full min-h-[400px] bg-muted/20 border border-border p-6 rounded-3xl outline-none text-base text-foreground/90 font-medium leading-relaxed resize-none"
+                            className="w-full min-h-[600px] bg-muted/20 border-2 border-foreground p-6 rounded-sm outline-none text-base text-foreground/90 font-medium leading-relaxed resize-none shadow-[4px_4px_0_var(--color-retro-sand)] focus:shadow-[4px_4px_0_var(--color-primary)]"
                             value={generatedMoM}
                             readOnly
                         />
@@ -65,7 +65,7 @@ const CopyButton: React.FC<{ text: string }> = ({ text }) => {
         <button
             type="button"
             onClick={handleCopy}
-            className={`px-8 py-4 rounded-full font-black text-sm tracking-tighter transition-all shadow-lg flex items-center gap-2 ${copied ? "bg-green-500 text-white" : "bg-foreground text-background hover:scale-105"
+            className={`px-8 py-4 rounded-sm font-bold border-2 border-foreground transition-all shadow-[4px_4px_0_var(--color-retro-ink)] flex items-center gap-2 ${copied ? "bg-green-500 text-white" : "bg-foreground text-background hover:translate-x-[1px] hover:translate-y-[1px]"
                 }`}
         >
             {copied ? "COPIED!" : "COPY"}

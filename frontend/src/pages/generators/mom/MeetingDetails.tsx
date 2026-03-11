@@ -24,13 +24,14 @@ export const MeetingDetails: React.FC<MeetingDetailsProps> = ({
     if (!transcription) return null;
 
     return (
-        <div className="bg-card/40 backdrop-blur-xl border border-border rounded-3xl p-8 space-y-4 shadow-xl">
-            <label className="text-xs font-black tracking-widest text-muted-foreground uppercase opacity-80">
+        <div className="bg-card border-2 border-foreground p-8 space-y-4 shadow-[6px_6px_0_var(--color-retro-sand)]">
+            <label className="text-xs font-semibold tracking-widest text-muted-foreground uppercase opacity-80 flex items-center gap-2">
+                <span className="w-4 h-4 rounded-full bg-primary/20 flex items-center justify-center text-[10px] text-primary">2</span>
                 Meeting Details
             </label>
             <input
                 type="text"
-                className="w-full p-4 bg-background/50 border border-border rounded-2xl text-foreground font-bold focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-muted-foreground/30"
+                className="w-full p-4 bg-background border-2 border-foreground rounded-sm text-foreground font-bold focus:shadow-[4px_4px_0_var(--color-primary)] transition-all placeholder:text-muted-foreground/30 outline-none"
                 placeholder="Meeting Title (Optional)"
                 value={meetingTitle}
                 onChange={(e) => setMeetingTitle(e.target.value)}
@@ -40,7 +41,7 @@ export const MeetingDetails: React.FC<MeetingDetailsProps> = ({
                 type="button"
                 onClick={handleGenerate}
                 disabled={isGenerating || !selectedTemplateId || templatesLoading}
-                className="w-full py-5 bg-primary text-primary-foreground text-xl font-black rounded-2xl hover:brightness-110 shadow-lg active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-3 uppercase tracking-tighter"
+                className="w-full py-5 bg-primary text-primary-foreground text-xl font-bold rounded-sm border-2 border-foreground shadow-[6px_6px_0_var(--color-retro-ink)] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none transition-all disabled:opacity-50 flex items-center justify-center gap-3 uppercase tracking-tight"
             >
                 {isGenerating ? (
                     <span className="w-6 h-6 border-4 border-current border-t-transparent rounded-full animate-spin" />

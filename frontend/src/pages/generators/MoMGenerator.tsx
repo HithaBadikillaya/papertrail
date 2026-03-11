@@ -192,8 +192,28 @@ export default function MoMGenerator() {
                     setIsModalOpen(true);
                 }} />
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    <div className="lg:col-span-4 space-y-8">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    <div className="lg:col-span-4">
+                        <TemplateGrid
+                            templates={templates}
+                            selectedTemplateId={selectedTemplateId}
+                            setSelectedTemplateId={setSelectedTemplateId}
+                            setPreviewTemplate={setPreviewTemplate}
+                            templatesLoading={templatesLoading}
+                            templatesError={templatesError}
+                            openEditModal={(template, e) => {
+                                e.stopPropagation();
+                                setEditingTemplate(template);
+                                setModalName(template.name);
+                                setModalContent(template.content);
+                                setModalStructure(template.structure);
+                                setIsModalOpen(true);
+                            }}
+                            handleDeleteTemplate={handleDeleteTemplate}
+                        />
+                    </div>
+
+                    <div className="lg:col-span-8 space-y-10">
                         <FileUploadZone
                             uploadedFile={uploadedFile}
                             isDragging={isDragging}
@@ -216,26 +236,6 @@ export default function MoMGenerator() {
                             selectedTemplateId={selectedTemplateId}
                             templatesLoading={templatesLoading}
                             generationError={generationError}
-                        />
-                    </div>
-
-                    <div className="lg:col-span-8 space-y-10">
-                        <TemplateGrid
-                            templates={templates}
-                            selectedTemplateId={selectedTemplateId}
-                            setSelectedTemplateId={setSelectedTemplateId}
-                            setPreviewTemplate={setPreviewTemplate}
-                            templatesLoading={templatesLoading}
-                            templatesError={templatesError}
-                            openEditModal={(template, e) => {
-                                e.stopPropagation();
-                                setEditingTemplate(template);
-                                setModalName(template.name);
-                                setModalContent(template.content);
-                                setModalStructure(template.structure);
-                                setIsModalOpen(true);
-                            }}
-                            handleDeleteTemplate={handleDeleteTemplate}
                         />
 
                         <ResultsDisplay

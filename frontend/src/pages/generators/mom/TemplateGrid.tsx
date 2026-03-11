@@ -23,118 +23,92 @@ export const TemplateGrid: React.FC<TemplateGridProps> = ({
     templatesError,
 }) => {
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 lg:sticky lg:top-10 max-h-[calc(100vh-180px)] overflow-y-auto pr-2 custom-scrollbar">
             <div className="flex justify-between items-center px-1">
-                <label className="text-sm font-black tracking-widest text-foreground uppercase">
-                    Select Template
+                <label className="text-sm font-semibold tracking-widest text-foreground uppercase">
+                    1. Select Style
                 </label>
                 <span className="text-[10px] font-mono text-muted-foreground uppercase">
-                    {templatesLoading ? "Loading..." : templatesError ? "Error" : `${templates.length} Templates Loaded`}
+                    {templatesLoading ? "Loading..." : templatesError ? "Error" : `${templates.length} Loaded`}
                 </span>
             </div>
 
             {templatesError && (
-                <div className="p-10 bg-destructive/10 border-2 border-dashed border-destructive/20 rounded-[2rem] text-center">
-                    <p className="text-destructive font-black uppercase tracking-tighter">{templatesError}</p>
-                    <p className="text-xs text-muted-foreground mt-2">Check if your backend is running at http://localhost:5000</p>
+                <div className="p-10 bg-destructive/5 border-2 border-dashed border-destructive rounded-sm text-center shadow-[4px_4px_0_var(--color-destructive)]">
+                    <p className="text-destructive font-bold uppercase tracking-tight">{templatesError}</p>
                 </div>
             )}
 
             {templatesLoading && !templatesError && (
-                <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                     {[1, 2, 3].map(i => (
-                        <div key={i} className="aspect-[3/4] rounded-3xl border-2 border-border bg-card/20 animate-pulse" />
+                        <div key={i} className="h-24 border-2 border-foreground/20 bg-card/20 animate-pulse" />
                     ))}
                 </div>
             )}
 
             {!templatesLoading && !templatesError && templates.length === 0 && (
-                <div className="p-20 bg-card/40 border-2 border-dashed border-border rounded-[3rem] text-center">
-                    <p className="text-muted-foreground font-black uppercase tracking-widest text-sm">No MoM templates found.</p>
-                    <p className="text-[10px] text-muted-foreground/50 mt-2 uppercase tracking-tighter">Create a new template to get started</p>
+                <div className="p-10 bg-card border-2 border-dashed border-foreground/20 rounded-sm text-center">
+                    <p className="text-muted-foreground font-bold uppercase tracking-widest text-[10px]">No templates found.</p>
                 </div>
             )}
 
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4">
                 {templates.map((template) => (
                     <div
                         key={template.id}
                         onClick={() => setSelectedTemplateId(template.id)}
-                        className={`relative group cursor-pointer aspect-[3/4] rounded-3xl border-2 transition-all overflow-hidden ${selectedTemplateId === template.id
-                            ? "border-primary bg-primary/10 shadow-[0_0_30px_rgba(var(--primary),0.2)]"
-                            : "border-border bg-card/40 hover:border-primary/50"
+                        className={`relative group cursor-pointer border-2 transition-all overflow-hidden ${selectedTemplateId === template.id
+                            ? "border-foreground bg-primary/5 shadow-[3px_3px_0_var(--color-primary)]"
+                            : "border-foreground/20 bg-card hover:border-foreground/50 hover:shadow-[3px_3px_0_var(--color-retro-sand)]"
                             }`}
                     >
-                        <div className="p-6 h-full flex flex-col justify-between">
-                            <div className="space-y-2">
+                        <div className="p-4 flex gap-4 items-center">
+                            <div className="flex-1 space-y-1">
                                 <div className="flex justify-between items-start">
                                     <div
-                                        className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest ${template.type === "system"
-                                            ? "bg-secondary text-black"
+                                        className={`px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest ${template.type === "system"
+                                            ? "bg-secondary/20 text-foreground"
                                             : "bg-primary/20 text-primary"
                                             }`}
                                     >
                                         {template.type}
                                     </div>
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setPreviewTemplate(template);
-                                        }}
-                                        className="px-2 py-1 text-xs bg-background/50 rounded-lg hover:bg-background transition-colors text-muted-foreground hover:text-foreground"
-                                    >
-                                        Preview
-                                    </button>
                                 </div>
-                                <h4 className="font-bold text-sm leading-tight text-foreground line-clamp-2">
+                                <h4 className="font-bold text-xs leading-tight text-foreground truncate max-w-[180px]">
                                     {template.name.toUpperCase()}
                                 </h4>
                             </div>
-
-                            <div className="space-y-4">
-                                <div className="h-20 opacity-30 select-none">
-                                    {template.structure ? (
-                                        <div className="flex flex-col gap-1">
-                                            {template.structure.split(/\s*[+→]\s*/).map((_, i) => (
-                                                <div
-                                                    key={i}
-                                                    className="w-full h-2 bg-foreground/20 rounded-full"
-                                                    style={{ width: `${Math.max(40, 100 - i * 15)}%` }}
-                                                />
-                                            ))}
-                                        </div>
-                                    ) : (
-                                        <>
-                                            <div className="w-full h-2 bg-foreground/20 rounded-full mb-2" />
-                                            <div className="w-5/6 h-2 bg-foreground/20 rounded-full mb-2" />
-                                            <div className="w-4/6 h-2 bg-foreground/20 rounded-full" />
-                                        </>
-                                    )}
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setPreviewTemplate(template);
+                                }}
+                                className="p-2 text-muted-foreground hover:text-primary transition-colors"
+                                title="Preview Template"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
+                            </button>
+                            {template.type === "user" && (
+                                <div className="flex gap-1">
+                                    <button
+                                        onClick={(e) => openEditModal(template, e)}
+                                        className="p-2 text-muted-foreground hover:text-foreground transition-colors"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
+                                    </button>
+                                    <button
+                                        onClick={(e) => handleDeleteTemplate(template.id, e)}
+                                        className="p-2 text-muted-foreground hover:text-destructive transition-colors"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /></svg>
+                                    </button>
                                 </div>
-
-                                {template.type === "user" && (
-                                    <div className="flex gap-2">
-                                        <button
-                                            onClick={(e) => openEditModal(template, e)}
-                                            className="flex-1 py-1.5 bg-background/50 text-[10px] font-black rounded-lg hover:bg-background"
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            onClick={(e) => handleDeleteTemplate(template.id, e)}
-                                            className="px-2 py-1.5 bg-destructive/10 text-destructive text-[10px] font-black rounded-lg hover:bg-destructive/20"
-                                        >
-                                            ✕
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
+                            )}
                         </div>
 
                         {selectedTemplateId === template.id && (
-                            <div className="absolute top-2 right-2 w-4 h-4 bg-primary rounded-full border-2 border-background flex items-center justify-center text-[8px] text-primary-foreground font-black">
-                                ✓
-                            </div>
+                            <div className="absolute top-0 right-0 w-1 h-full bg-primary" />
                         )}
                     </div>
                 ))}

@@ -75,40 +75,40 @@ export function ExportOptions({ content, filename = "document" }: ExportOptionsP
             <button
                 type="button"
                 onClick={handleCopy}
-                className={`px-4 py-2 rounded-xl font-bold text-xs tracking-wider transition-all shadow-md flex items-center gap-2 uppercase ${copied ? "bg-green-500 text-white" : "bg-foreground text-background hover:scale-105"
+                className={`px-4 py-2 rounded-sm font-bold text-xs tracking-wider transition-all border-2 border-foreground shadow-[3px_3px_0_var(--color-primary)] flex items-center gap-2 uppercase ${copied ? "bg-green-500 text-white" : "bg-foreground text-background hover:translate-x-[1px] hover:translate-y-[1px]"
                     }`}
             >
-                {copied ? "Copied!" : "Copy"}
+                {copied ? "COPIED!" : "COPY"}
             </button>
 
             {canShare && (
                 <button
                     type="button"
                     onClick={handleShare}
-                    className="px-4 py-2 rounded-xl font-bold text-xs tracking-wider transition-all shadow-md flex items-center gap-2 uppercase bg-foreground text-background hover:scale-105"
+                    className="px-4 py-2 rounded-sm font-bold text-xs tracking-wider transition-all border-2 border-foreground shadow-[3px_3px_0_var(--color-retro-sand)] flex items-center gap-2 uppercase bg-background text-foreground hover:translate-x-[1px] hover:translate-y-[1px]"
                 >
                     Share
                 </button>
             )}
 
-            <div className="flex gap-1 bg-muted/20 p-1 rounded-xl">
+            <div className="flex gap-1 bg-muted/20 p-1 border-2 border-foreground rounded-sm shadow-[3px_3px_0_var(--color-retro-sand)]">
                 <button
                     onClick={handleDownloadMarkdown}
-                    className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider hover:bg-background/50 rounded-lg transition-colors text-muted-foreground hover:text-foreground"
+                    className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider hover:bg-primary/20 transition-colors text-muted-foreground hover:text-foreground"
                     title="Download Markdown"
                 >
                     .MD
                 </button>
                 <button
                     onClick={handleDownloadPDF}
-                    className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider hover:bg-background/50 rounded-lg transition-colors text-muted-foreground hover:text-foreground"
+                    className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider hover:bg-primary/20 transition-colors text-muted-foreground hover:text-foreground border-l border-r border-foreground/20"
                     title="Download PDF"
                 >
                     .PDF
                 </button>
                 <button
                     onClick={handleDownloadText}
-                    className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider hover:bg-background/50 rounded-lg transition-colors text-muted-foreground hover:text-foreground"
+                    className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider hover:bg-primary/20 transition-colors text-muted-foreground hover:text-foreground"
                     title="Download Text"
                 >
                     .TXT

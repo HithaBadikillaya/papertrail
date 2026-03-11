@@ -116,8 +116,8 @@ export default function CaptionGenerator() {
       <div className="relative z-10 w-full max-w-6xl space-y-10 mt-6 pb-20">
         <div className="flex flex-col md:flex-row justify-between items-end gap-4 border-b border-border pb-6">
           <div className="space-y-1">
-            <h2 className="text-4xl md:text-6xl font-amarna font-black text-foreground tracking-tighter decoration-primary decoration-4">
-              MEDIA CAPTIONS
+            <h2 className="text-4xl md:text-6xl font-zilla font-bold text-foreground tracking-tighter decoration-primary decoration-4">
+              AI Caption Generator
             </h2>
             <p className="text-muted-foreground font-mono text-sm tracking-widest uppercase opacity-70">
               Generate captions for your posts
@@ -125,194 +125,178 @@ export default function CaptionGenerator() {
           </div>
           <button
             onClick={openCreateModal}
-            className="px-6 py-3 bg-foreground text-background font-black rounded-full hover:scale-105 transition-all shadow-[0_4px_20px_rgba(0,0,0,0.3)] text-sm tracking-tighter"
+            className="px-6 py-3 bg-foreground text-background font-semibold rounded-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all border-2 border-foreground shadow-[4px_4px_0_var(--color-primary)] text-sm tracking-tighter"
           >
             + NEW TEMPLATE
           </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Sidebar / Controls */}
-          <div className="lg:col-span-4 space-y-8">
-            {/* Tone & Platform Selection */}
-            <div className="bg-card/40 backdrop-blur-xl border border-border rounded-3xl p-8 space-y-6 shadow-xl">
-              <div className="space-y-4">
-                <label className="text-xs font-black tracking-widest text-muted-foreground uppercase opacity-80">
-                  Target Platform
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  {["instagram", "twitter", "linkedin", "youtube", "whatsapp"].map((p) => (
-                    <button
-                      key={p}
-                      onClick={() => setPlatform(p)}
-                      className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all uppercase tracking-tighter ${platform === p
-                        ? "bg-primary text-primary-foreground border-primary shadow-[0_0_15px_rgba(var(--primary),0.3)]"
-                        : "bg-background/20 border-border text-foreground hover:border-primary/50"
-                        }`}
-                    >
-                      {p}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <label className="text-xs font-black tracking-widest text-muted-foreground uppercase opacity-80">
-                  Tone
-                </label>
-                <select
-                  className="w-full p-4 bg-background/50 border border-border rounded-2xl text-foreground font-bold focus:ring-2 focus:ring-primary/50 appearance-none cursor-pointer hover:bg-background/80 transition-colors"
-                  value={tone}
-                  onChange={(e) => setTone(e.target.value)}
-                >
-                  <option value="casual">Casual & Relatable</option>
-                  <option value="professional">Sleek & Professional</option>
-                  <option value="promotional">Hype & High-Energy</option>
-                  <option value="witty">Witty & Sharp</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Content Input Area */}
-            <div className="bg-card/40 backdrop-blur-xl border border-border rounded-3xl p-8 space-y-4 shadow-xl">
-              <label className="text-xs font-black tracking-widest text-muted-foreground uppercase opacity-80">
-                Info about the media
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* LEFT SIDEBAR: Template Gallery */}
+          <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-10 max-h-[calc(100vh-180px)] overflow-y-auto pr-2 custom-scrollbar">
+            <div className="flex justify-between items-center px-1">
+              <label className="text-sm font-semibold tracking-widest text-foreground uppercase font-inter">
+                1. Select Style
               </label>
-              <textarea
-                className="w-full min-h-[200px] p-6 text-lg bg-background/50 border border-border rounded-2xl focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-muted-foreground/30 resize-none font-medium leading-relaxed"
-                placeholder="What's the story you want to tell? Paste raw notes, bullet points, or rough drafts..."
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-              />
-              <button
-                type="button"
-                onClick={() => handleGenerate()}
-                disabled={loading || templatesLoading}
-                className="w-full py-5 bg-primary text-primary-foreground text-xl font-black rounded-2xl hover:brightness-110 shadow-lg active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-3 uppercase tracking-tighter"
-              >
-                {loading ? (
-                  <span className="w-6 h-6 border-4 border-current border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  "CRAFT CONTENT"
-                )}
-              </button>
-              {error && <p className="text-destructive text-center text-xs font-bold uppercase mt-2">{error}</p>}
+              <span className="text-[10px] font-mono text-muted-foreground uppercase">
+                {captionTemplates.length} Loaded
+              </span>
             </div>
-          </div>
 
-          {/* Template Gallery & Results */}
-          <div className="lg:col-span-8 space-y-10">
-            {/* Gallery Section */}
-            <div className="space-y-6">
-              <div className="flex justify-between items-center px-1">
-                <label className="text-sm font-black tracking-widest text-foreground uppercase">
-                  Select Template
-                </label>
-                <span className="text-[10px] font-mono text-muted-foreground uppercase">
-                  {captionTemplates.length} Templates Loaded
-                </span>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {captionTemplates.map((t) => (
-                  <div
-                    key={t.id}
-                    onClick={() => setSelectedTemplateId(t.id)}
-                    className={`relative group cursor-pointer aspect-[3/4] rounded-3xl border-2 transition-all overflow-hidden ${selectedTemplateId === t.id
-                      ? "border-primary bg-primary/10 shadow-[0_0_30px_rgba(var(--primary),0.2)]"
-                      : "border-border bg-card/40 hover:border-primary/50"
-                      }`}
-                  >
-                    <div className="p-6 h-full flex flex-col justify-between">
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-start">
-                          <div
-                            className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest ${t.type === "system" ? "bg-secondary text-black" : "bg-primary/20 text-primary"
-                              }`}
-                          >
-                            {t.type}
-                          </div>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setPreviewTemplate(t);
-                            }}
-                            className="px-2 py-1 text-xs bg-background/50 rounded-lg hover:bg-background transition-colors text-muted-foreground hover:text-foreground"
-                          >
-                            Preview
-                          </button>
-                        </div>
-                        <h4 className="font-bold text-sm leading-tight text-foreground line-clamp-2">
-                          {t.name.toUpperCase()}
-                        </h4>
-                      </div>
-
-                      <div className="space-y-4">
-                        <div className="h-20 opacity-30 select-none">
-                          {t.structure ? (
-                            <div className="flex flex-col gap-1">
-                              {t.structure.split(/\s*[+→]\s*/).map((_: string, i: number) => (
-                                <div key={i} className="w-full h-2 bg-foreground/20 rounded-full" style={{ width: `${Math.max(40, 100 - i * 15)}%` }} />
-                              ))}
-                            </div>
-                          ) : (
-                            <>
-                              <div className="w-full h-2 bg-foreground/20 rounded-full mb-2" />
-                              <div className="w-5/6 h-2 bg-foreground/20 rounded-full mb-2" />
-                              <div className="w-4/6 h-2 bg-foreground/20 rounded-full" />
-                            </>
-                          )}
-                        </div>
-                        {t.type === "user" && (
-                          <div className="flex gap-2">
-                            <button
-                              onClick={(e) => openEditModal(t, e)}
-                              className="flex-1 py-1.5 bg-background/50 text-[10px] font-black rounded-lg hover:bg-background"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                removeTemplate(t.id);
-                              }}
-                              className="px-2 py-1.5 bg-destructive/10 text-destructive text-[10px] font-black rounded-lg hover:bg-destructive/20"
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        )}
+            <div className="grid grid-cols-1 gap-4">
+              {captionTemplates.map((t) => (
+                <div
+                  key={t.id}
+                  onClick={() => setSelectedTemplateId(t.id)}
+                  className={`relative group cursor-pointer border-2 transition-all p-4 flex gap-4 items-center ${selectedTemplateId === t.id
+                    ? "border-foreground bg-primary/5 shadow-[3px_3px_0_var(--color-primary)]"
+                    : "border-foreground/20 bg-card hover:border-foreground/50 hover:shadow-[3px_3px_0_var(--color-retro-sand)]"
+                    }`}
+                >
+                  <div className="flex-1 space-y-1">
+                    <div className="flex justify-between items-start">
+                      <div
+                        className={`px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest ${t.type === "system" ? "bg-secondary/20 text-foreground" : "bg-primary/20 text-primary"
+                          }`}
+                      >
+                        {t.type}
                       </div>
                     </div>
-
-                    {selectedTemplateId === t.id && (
-                      <div className="absolute top-2 right-2 w-4 h-4 bg-primary rounded-full border-2 border-background flex items-center justify-center text-[8px] text-primary-foreground font-black">
-                        ✓
+                    <h4 className="font-bold text-xs leading-tight text-foreground truncate max-w-[180px]">
+                      {t.name.toUpperCase()}
+                    </h4>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPreviewTemplate(t);
+                      }}
+                      className="p-2 text-muted-foreground hover:text-primary transition-colors"
+                      title="Preview Template"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
+                    </button>
+                    {t.type === "user" && (
+                      <div className="flex gap-1">
+                        <button
+                          onClick={(e) => openEditModal(t, e)}
+                          className="p-2 text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeTemplate(t.id);
+                          }}
+                          className="p-2 text-muted-foreground hover:text-destructive transition-colors"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /></svg>
+                        </button>
                       </div>
                     )}
                   </div>
-                ))}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* RIGHT COLUMN: Work Area */}
+          <div className="lg:col-span-8 space-y-8">
+            {/* 2. Configuration & Input */}
+            <div className="bg-card border-2 border-foreground p-8 space-y-8 shadow-[6px_6px_0_var(--color-retro-sand)]">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-4">
+                  <label className="text-xs font-semibold tracking-widest text-muted-foreground uppercase opacity-80 flex items-center gap-2">
+                    <span className="w-4 h-4 rounded-full bg-primary/20 flex items-center justify-center text-[10px] text-primary">2</span>
+                    Target Platform
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {["instagram", "twitter", "linkedin", "youtube", "whatsapp"].map((p) => (
+                      <button
+                        key={p}
+                        onClick={() => setPlatform(p)}
+                        className={`px-4 py-2 text-[10px] font-bold border-2 transition-all uppercase tracking-tighter ${platform === p
+                          ? "bg-primary text-primary-foreground border-foreground shadow-[2px_2px_0_var(--color-retro-ink)]"
+                          : "bg-background border-foreground/20 text-foreground hover:border-foreground hover:shadow-[2px_2px_0_var(--color-retro-sand)]"
+                          }`}
+                      >
+                        {p}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <label className="text-xs font-semibold tracking-widest text-muted-foreground uppercase opacity-80 flex items-center gap-2">
+                    <span className="w-4 h-4 rounded-full bg-primary/20 flex items-center justify-center text-[10px] text-primary">3</span>
+                    Voice & Tone
+                  </label>
+                  <select
+                    className="w-full p-3 bg-background border-2 border-foreground rounded-sm text-sm font-bold focus:shadow-[3px_3px_0_var(--color-primary)] appearance-none cursor-pointer outline-none"
+                    value={tone}
+                    onChange={(e) => setTone(e.target.value)}
+                  >
+                    <option value="casual">Casual & Relatable</option>
+                    <option value="professional">Sleek & Professional</option>
+                    <option value="promotional">Hype & High-Energy</option>
+                    <option value="witty">Witty & Sharp</option>
+                  </select>
+                </div>
               </div>
+
+              <div className="space-y-4 pt-4 border-t border-border/50">
+                <label className="text-xs font-semibold tracking-widest text-muted-foreground uppercase opacity-80 flex items-center gap-2">
+                  <span className="w-4 h-4 rounded-full bg-primary/20 flex items-center justify-center text-[10px] text-primary">4</span>
+                  Brief (The Story)
+                </label>
+                <textarea
+                  className="w-full min-h-[180px] p-6 text-lg bg-background border-2 border-foreground rounded-sm focus:shadow-[4px_4px_0_var(--color-primary)] transition-all placeholder:text-muted-foreground/30 resize-none font-zilla leading-relaxed outline-none"
+                  placeholder="What's the story you want to tell? Paste raw notes or rough drafts..."
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                />
+              </div>
+
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => handleGenerate()}
+                  disabled={loading || templatesLoading}
+                  className="px-10 py-4 bg-primary text-primary-foreground text-lg font-bold rounded-sm border-2 border-foreground hover:translate-x-[2px] hover:translate-y-[2px] shadow-[6px_6px_0_var(--color-retro-ink)] active:shadow-none transition-all disabled:opacity-50 flex items-center gap-3 uppercase tracking-tight"
+                >
+                  {loading ? (
+                    <span className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <span>Craft Content</span>
+                    </>
+                  )}
+                </button>
+              </div>
+              {error && <p className="text-destructive text-center text-xs font-bold uppercase mt-2">{error}</p>}
             </div>
 
-            {/* Results Section */}
+            {/* 5. Results Section */}
             {caption && (
-              <div className="animate-in fade-in slide-in-from-bottom-12 duration-700">
-                <div className="bg-card border-2 border-primary/30 rounded-[2.5rem] p-1 shadow-2xl overflow-hidden">
-                  <div className="bg-background rounded-[2.3rem] p-10 space-y-8">
-                    <div className="flex justify-between items-start">
+              <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
+                <div className="bg-card border-2 border-foreground p-1 shadow-[8px_8px_0_var(--color-primary)] overflow-hidden">
+                  <div className="bg-retro-linen p-10 space-y-8 relative">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 pointer-events-none" />
+                    <div className="flex justify-between items-start relative z-10">
                       <div className="space-y-1">
-                        <span className="text-[10px] font-black text-primary tracking-[0.3em] uppercase">All done!</span>
-                        <h4 className="text-3xl font-black text-foreground tracking-tighter">Here's your caption</h4>
+                        <span className="text-[10px] font-semibold text-primary tracking-[0.3em] uppercase">Manuscript Ready</span>
+                        <h4 className="text-2xl font-bold text-foreground tracking-tight">Caption is ready!</h4>
                       </div>
-                      <div className="flex gap-4">
+                      <div className="flex gap-3">
                         <button
                           type="button"
                           onClick={handleExpand}
                           disabled={loading}
-                          className="px-8 py-4 rounded-full font-black text-sm tracking-tighter transition-all shadow-lg flex items-center gap-2 bg-primary/10 text-primary border-2 border-primary/20 hover:bg-primary/20 hover:scale-105 disabled:opacity-50 disabled:scale-100"
+                          className="px-6 py-3 rounded-sm font-bold text-xs tracking-tight transition-all bg-background border-2 border-foreground shadow-[3px_3px_0_var(--color-retro-ink)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_var(--color-retro-ink)] disabled:opacity-50"
                         >
-                          {loading ? "EXPANDING..." : "EXPAND"}
+                          {loading ? "Expanding..." : "Expand Copy"}
                         </button>
                         <ExportOptions content={caption} filename="caption" />
                       </div>
@@ -320,7 +304,7 @@ export default function CaptionGenerator() {
 
                     <div className="relative group">
                       <textarea
-                        className="w-full min-h-[120px] bg-muted/20 border border-border p-6 rounded-3xl outline-none text-xl text-foreground/90 font-medium leading-relaxed resize-none"
+                        className="w-full min-h-[600px] bg-white/50 border-2 border-foreground p-8 rounded-sm outline-none text-xl text-foreground/90 font-zilla italic shadow-[4px_4px_0_var(--color-retro-sand)] leading-relaxed resize-none"
                         value={caption}
                         readOnly
                       />
@@ -336,10 +320,10 @@ export default function CaptionGenerator() {
       {/* Template Create/Edit Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/90 backdrop-blur-xl">
-          <div className="bg-card border-4 border-border w-full max-w-2xl rounded-[3rem] shadow-3xl p-10 space-y-8 animate-in zoom-in-95 duration-300 max-h-[90vh] overflow-y-auto">
+          <div className="bg-card border-4 border-foreground w-full max-w-2xl shadow-2xl p-10 space-y-8 animate-in zoom-in-95 duration-300 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-start">
               <div className="space-y-1">
-                <h3 className="text-4xl font-black text-foreground tracking-tighter uppercase">
+                <h3 className="text-3xl font-bold text-foreground tracking-tight uppercase">
                   {editingTemplate ? "Edit Template" : "Create New Template"}
                 </h3>
                 <p className="text-muted-foreground font-mono text-xs uppercase tracking-widest">
@@ -357,10 +341,10 @@ export default function CaptionGenerator() {
             <div className="space-y-8">
               {/* Field 1: Name */}
               <div className="space-y-3">
-                <label className="text-sm font-black uppercase text-foreground tracking-widest">1. Name your template</label>
+                <label className="text-sm font-semibold uppercase text-foreground tracking-widest">1. Name your template</label>
                 <input
                   type="text"
-                  className="w-full p-5 bg-background border-2 border-border rounded-2xl text-xl font-bold focus:border-primary transition-all"
+                  className="w-full p-5 bg-background border-2 border-border rounded-sm text-xl font-bold focus:border-primary transition-all shadow-[4px_4px_0_var(--color-retro-sand)]"
                   placeholder="e.g. My Custom Instagram Style"
                   value={modalName}
                   onChange={(e) => setModalName(e.target.value)}
@@ -370,7 +354,7 @@ export default function CaptionGenerator() {
               {/* Field 2: Structure */}
               <div className="space-y-4">
                 <div className="flex justify-between items-end">
-                  <label className="text-sm font-black uppercase text-foreground tracking-widest">2. Content Plan (Layout)</label>
+                  <label className="text-sm font-semibold uppercase text-foreground tracking-widest">2. Content Plan (Layout)</label>
                   <span className="text-[10px] text-muted-foreground uppercase font-bold">Pick a style or type your own</span>
                 </div>
 
@@ -399,7 +383,7 @@ export default function CaptionGenerator() {
 
                 <input
                   type="text"
-                  className="w-full p-4 bg-background border-2 border-border rounded-2xl text-lg font-bold focus:border-primary transition-all"
+                  className="w-full p-4 bg-background border-2 border-border rounded-sm text-lg font-bold focus:border-primary transition-all shadow-[4px_4px_0_var(--color-retro-sand)]"
                   placeholder="Hook → Body → Details → Closing"
                   value={modalStructure}
                   onChange={(e) => setModalStructure(e.target.value)}
@@ -409,15 +393,15 @@ export default function CaptionGenerator() {
               {/* Field 3: AI Prompt */}
               <div className="space-y-4">
                 <div className="flex justify-between items-end">
-                  <label className="text-sm font-black uppercase text-foreground tracking-widest">3. AI Instructions</label>
+                  <label className="text-sm font-semibold uppercase text-foreground tracking-widest">3. AI Instructions</label>
                 </div>
-                <div className="p-4 bg-primary/5 border border-primary/20 rounded-2xl mb-2">
+                <div className="p-4 bg-primary/5 border border-primary/20 rounded-sm mb-2">
                   <p className="text-[11px] text-primary leading-relaxed font-bold">
-                    💡 The code <code className="bg-primary/10 px-1 rounded">{"{{inputText}}"}</code> is where the message you type in the main workspace will appear.
+                    The code <code className="bg-primary/10 px-1 rounded">{"{{inputText}}"}</code> is where the message you type in the main workspace will appear.
                   </p>
                 </div>
                 <textarea
-                  className="w-full min-h-[160px] p-6 bg-background border-2 border-border rounded-2xl text-base font-medium resize-none focus:border-primary transition-all leading-relaxed"
+                  className="w-full min-h-[160px] p-6 bg-background border-2 border-border rounded-sm text-base font-medium resize-none focus:border-primary transition-all leading-relaxed shadow-[4px_4px_0_var(--color-retro-sand)]"
                   placeholder={`Example: Write a formal letter regarding {{inputText}} and ensure it sounds professional.`}
                   value={modalContent}
                   onChange={(e) => setModalContent(e.target.value)}
@@ -428,14 +412,14 @@ export default function CaptionGenerator() {
             <div className="flex gap-4 pt-4">
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="flex-1 py-5 bg-muted/20 border-2 border-border rounded-2xl font-black uppercase tracking-tighter hover:bg-muted/40 transition-all"
+                className="flex-1 py-5 bg-muted/20 border-2 border-border rounded-sm font-bold uppercase tracking-tight hover:bg-muted/40 transition-all shadow-[4px_4px_0_var(--color-retro-ink)]"
               >
                 Discard
               </button>
               <button
                 onClick={handleSaveTemplate}
                 disabled={!modalName.trim() || !modalContent.trim()}
-                className="flex-[2] py-5 bg-primary text-primary-foreground rounded-2xl font-black uppercase tracking-tighter hover:scale-105 active:scale-95 transition-all shadow-xl disabled:opacity-30"
+                className="flex-[2] py-5 bg-primary text-primary-foreground rounded-sm font-bold uppercase tracking-tight hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none transition-all border-2 border-foreground shadow-[6px_6px_0_var(--color-retro-ink)] disabled:opacity-30"
               >
                 Save Template
               </button>
@@ -447,19 +431,19 @@ export default function CaptionGenerator() {
       {/* Preview Modal */}
       {previewTemplate && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/90 backdrop-blur-md">
-          <div className="bg-card border border-border w-full max-w-xl rounded-[2.5rem] shadow-2xl p-10 space-y-8">
+          <div className="bg-card border-4 border-foreground w-full max-w-xl shadow-2xl p-10 space-y-8">
             <div className="flex justify-between items-center border-b border-border pb-6">
-              <h3 className="text-2xl font-black text-foreground tracking-tighter uppercase">{previewTemplate.name}</h3>
-              <div className="px-3 py-1 bg-primary/10 text-primary text-[10px] font-black rounded-full uppercase tracking-widest">
-                {previewTemplate.type}
+              <h3 className="text-2xl font-bold text-foreground tracking-tight uppercase">{previewTemplate?.name}</h3>
+              <div className="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-sm border border-foreground uppercase tracking-widest shadow-[2px_2px_0_var(--color-primary)]">
+                {previewTemplate?.type}
               </div>
             </div>
 
             <div className="space-y-4">
-              <label className="text-[10px] font-black text-muted-foreground tracking-widest uppercase opacity-70">Anticipated Content Layout</label>
-              <div className="p-8 bg-muted/30 rounded-[2rem] border-2 border-dashed border-border/50 text-foreground font-bold text-lg text-center flex flex-col gap-4">
-                {previewTemplate.structure.split(/\s*[+→]\s*/).map((step: string, i: number) => (
-                  <div key={i} className="py-2 bg-background/50 rounded-xl border border-border/20 shadow-sm">
+              <label className="text-[10px] font-semibold text-muted-foreground tracking-widest uppercase opacity-70">Anticipated Content Layout</label>
+              <div className="p-8 bg-muted/30 rounded-sm border-2 border-dashed border-border/50 text-foreground font-bold text-lg text-center flex flex-col gap-4">
+                {previewTemplate?.structure?.split(/\s*[+→]\s*/).map((step: string, i: number) => (
+                  <div key={i} className="py-2 bg-background border-2 border-foreground shadow-[3px_3px_0_var(--color-retro-sand)]">
                     {step.trim()}
                   </div>
                 ))}
@@ -468,7 +452,7 @@ export default function CaptionGenerator() {
 
             <button
               onClick={() => setPreviewTemplate(null)}
-              className="w-full py-4 bg-foreground text-background rounded-2xl font-black uppercase tracking-tighter hover:brightness-110 active:scale-[0.98] transition-all"
+              className="w-full py-4 bg-foreground text-background border-2 border-foreground rounded-sm font-bold uppercase tracking-tight hover:translate-x-[1px] hover:translate-y-[1px] shadow-[4px_4px_0_var(--color-primary)] transition-all"
             >
               CLOSE PREVIEW
             </button>
@@ -478,4 +462,3 @@ export default function CaptionGenerator() {
     </div>
   );
 }
-

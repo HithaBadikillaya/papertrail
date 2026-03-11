@@ -37,20 +37,17 @@ export const TemplateManagementModal: React.FC<TemplateManagementModalProps> = (
     ];
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/90 backdrop-blur-xl">
-            <div className="bg-card border-4 border-border w-full max-w-2xl rounded-[3rem] shadow-3xl p-10 space-y-8 animate-in zoom-in-95 duration-300 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+            <div className="bg-card border border-border w-full max-w-2xl p-10 space-y-10 animate-in zoom-in-95 duration-300 max-h-[90vh] overflow-y-auto rounded-none shadow-2xl">
                 <div className="flex justify-between items-start">
                     <div className="space-y-1">
-                        <h3 className="text-4xl font-black text-foreground tracking-tighter uppercase">
-                            {editingTemplate ? "Edit Template" : "Create New Template"}
+                        <h3 className="text-2xl font-bold text-foreground tracking-tight uppercase font-inter">
+                            {editingTemplate ? "Update Protocol" : "Define New Protocol"}
                         </h3>
-                        <p className="text-muted-foreground font-mono text-xs uppercase tracking-widest">
-                            Define your meeting notes format
-                        </p>
                     </div>
                     <button
                         onClick={onClose}
-                        className="text-2xl hover:scale-110 transition-transform p-2"
+                        className="text-xl hover:text-primary transition-colors"
                     >
                         ✕
                     </button>
@@ -59,12 +56,10 @@ export const TemplateManagementModal: React.FC<TemplateManagementModalProps> = (
                 <div className="space-y-8">
                     {/* Template Name */}
                     <div className="space-y-3">
-                        <label className="text-sm font-black uppercase text-foreground tracking-widest">
-                            1. Name your template
-                        </label>
+                        <label className="text-[10px] font-bold uppercase text-muted-foreground tracking-[0.2em]">01. Protocol Identifier</label>
                         <input
                             type="text"
-                            className="w-full p-5 bg-background border-2 border-border rounded-2xl text-xl font-bold focus:border-primary transition-all"
+                            className="w-full p-4 bg-background border border-border rounded-none text-lg font-bold focus:border-primary transition-all outline-none"
                             placeholder="e.g. Sprint Retrospective Notes"
                             value={modalName}
                             onChange={(e) => setModalName(e.target.value)}
@@ -74,16 +69,14 @@ export const TemplateManagementModal: React.FC<TemplateManagementModalProps> = (
                     {/* Structure */}
                     <div className="space-y-4">
                         <div className="flex justify-between items-end">
-                            <label className="text-sm font-black uppercase text-foreground tracking-widest">
-                                2. Content Plan (Layout)
-                            </label>
-                            <span className="text-[10px] text-muted-foreground uppercase font-bold">
-                                Pick a style or type your own
+                            <label className="text-[10px] font-bold uppercase text-muted-foreground tracking-[0.2em]">02. Flow Hierarchy</label>
+                            <span className="text-[9px] text-muted-foreground uppercase font-bold">
+                                SELECT PRESET OR MANUALLY DEFINE
                             </span>
                         </div>
 
                         {/* Preset Chips */}
-                        <div className="flex flex-wrap gap-2 mb-2">
+                        <div className="flex flex-wrap gap-1.5 mb-2">
                             {presets.map(preset => (
                                 <button
                                     key={preset.label}
@@ -93,7 +86,7 @@ export const TemplateManagementModal: React.FC<TemplateManagementModalProps> = (
                                             setModalContent(preset.content);
                                         }
                                     }}
-                                    className="px-3 py-1.5 bg-muted/30 border border-border rounded-full text-[10px] font-bold hover:bg-primary/20 hover:border-primary transition-all"
+                                    className="px-2.5 py-1 bg-muted border border-border rounded-none text-[9px] font-bold hover:bg-primary/10 hover:border-primary transition-all uppercase"
                                 >
                                     + {preset.label}
                                 </button>
@@ -102,7 +95,7 @@ export const TemplateManagementModal: React.FC<TemplateManagementModalProps> = (
 
                         <input
                             type="text"
-                            className="w-full p-4 bg-background border-2 border-border rounded-2xl text-lg font-bold focus:border-primary transition-all"
+                            className="w-full p-4 bg-background border border-border rounded-none text-base font-medium focus:border-primary transition-all outline-none"
                             placeholder="Title + Attendees + Discussion + Action Items"
                             value={modalStructure}
                             onChange={(e) => setModalStructure(e.target.value)}
@@ -111,18 +104,15 @@ export const TemplateManagementModal: React.FC<TemplateManagementModalProps> = (
 
                     {/* AI Instructions */}
                     <div className="space-y-4">
-                        <label className="text-sm font-black uppercase text-foreground tracking-widest">
-                            3. AI Instructions
-                        </label>
-                        <div className="p-4 bg-primary/5 border border-primary/20 rounded-2xl mb-2">
-                            <p className="text-[11px] text-primary leading-relaxed font-bold">
-                                💡 Use <code className="bg-primary/10 px-1 rounded">{"{{transcriptText}}"}</code> where the
-                                meeting transcription should appear.
+                        <label className="text-[10px] font-bold uppercase text-muted-foreground tracking-[0.2em]">03. Strategic Instructs</label>
+                        <div className="p-3 bg-primary/5 border border-primary/20 rounded-none mb-2">
+                            <p className="text-[10px] text-primary font-bold tracking-tight">
+                                USE <code className="bg-primary/10 px-1 rounded">{"{{transcriptText}}"}</code> AS THE DYNAMIC DATA INJECTION POINT.
                             </p>
                         </div>
                         <textarea
-                            className="w-full min-h-[160px] p-6 bg-background border-2 border-border rounded-2xl text-base font-medium resize-none focus:border-primary transition-all leading-relaxed"
-                            placeholder="Example: Analyze the following meeting transcript and create structured notes with key takeaways: {{transcriptText}}"
+                            className="w-full min-h-[160px] p-6 bg-background border border-border rounded-none text-sm font-medium resize-none focus:border-primary transition-all leading-relaxed outline-none"
+                            placeholder="Define architectural instructions for the AI..."
                             value={modalContent}
                             onChange={(e) => setModalContent(e.target.value)}
                         />
@@ -132,16 +122,16 @@ export const TemplateManagementModal: React.FC<TemplateManagementModalProps> = (
                 <div className="flex gap-4 pt-4">
                     <button
                         onClick={onClose}
-                        className="flex-1 py-5 bg-muted/20 border-2 border-border rounded-2xl font-black uppercase tracking-tighter hover:bg-muted/40 transition-all"
+                        className="flex-1 py-4 bg-muted text-muted-foreground border border-border rounded-none font-bold uppercase text-[10px] tracking-widest hover:bg-muted/80 transition-all font-inter"
                     >
-                        Discard
+                        DISCARD
                     </button>
                     <button
                         onClick={handleSaveTemplate}
                         disabled={!modalName.trim() || !modalContent.trim()}
-                        className="flex-[2] py-5 bg-primary text-primary-foreground rounded-2xl font-black uppercase tracking-tighter hover:scale-105 active:scale-95 transition-all shadow-xl disabled:opacity-30"
+                        className="flex-[2] py-4 bg-primary text-primary-foreground rounded-none font-bold uppercase text-[10px] tracking-widest hover:bg-primary/90 transition-all disabled:opacity-30 font-inter"
                     >
-                        Save Template
+                        COMMIT PROTOCOL
                     </button>
                 </div>
             </div>
