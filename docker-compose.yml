@@ -10,7 +10,8 @@ services:
       - /app/node_modules
       - ./backend/uploads:/app/uploads
     env_file:
-      - ./backend/.env
+      - path: ./backend/.env
+        required: false
     restart: always
 
   frontend:
@@ -22,8 +23,6 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    env_file:
-      - ./frontend/.env
     restart: always
     depends_on:
       - backend
