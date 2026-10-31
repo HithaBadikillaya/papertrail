@@ -33,6 +33,7 @@ if (!fs.existsSync(UPLOAD_DIR)) {
 }
 
 const CHUNK_MINUTES = parseInt(process.env.CHUNK_MINUTES, 10) || 7;
+const INVALID_FILE_TYPE_MESSAGE = "Invalid file type. Only audio/video files are allowed.";
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -62,7 +63,7 @@ const fileFilter = (req, file, cb) => {
     if (allowedMimes.includes(file.mimetype)) {
         cb(null, true);
     } else {
-        cb(new Error("Invalid file type. Only audio/video files are allowed."), false);
+        cb(new Error(INVALID_FILE_TYPE_MESSAGE), false);
     }
 };
 
@@ -74,9 +75,29 @@ const upload = multer({
     },
 });
 
+// Convert expected upload rejections to JSON for the client; let unexpected errors reach Express.
+const handleUpload = (req, res, next) => {
+    upload.single("file")(req, res, (error) => {
+        if (!error) {
+            return next();
+        }
+
+        if (error.message === INVALID_FILE_TYPE_MESSAGE) {
+            return res.status(400).json({ success: false, message: error.message });
+        }
+
+        if (error instanceof multer.MulterError) {
+            const status = error.code === "LIMIT_FILE_SIZE" ? 413 : 400;
+            return res.status(status).json({ success: false, message: error.message });
+        }
+
+        return next(error);
+    });
+};
+
 // POST /api/mom/upload-transcribe — async with job polling
 
-router.post("/upload-transcribe", upload.single("file"), (req, res) => {
+router.post("/upload-transcribe", handleUpload, (req, res) => {
     if (!req.file) {
         return res.status(400).json({ success: false, message: "No file uploaded" });
     }
