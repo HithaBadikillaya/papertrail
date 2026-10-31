@@ -18,13 +18,29 @@ You will need [Docker](https://www.docker.com/get-started) installed on your com
 
 ### Start the Application
 
-To start everything, open your terminal in the project folder and run:
+No environment files are required just to start the application. Open a terminal in the project folder and run:
 
 ```bash
 docker compose up
 ```
 
-Once it finishes loading, you can open your browser and go to `http://localhost:5173` to start using the tools.
+Once the services are running, open `http://localhost:5173` in your browser to start using the tools.
+
+### Enable AI Generation
+
+Caption and meeting-minutes generation use the Hugging Face Inference API and require an API token. To enable these features, copy the backend example file and add your token:
+
+```bash
+cp backend/.env.example backend/.env
+```
+
+On Windows PowerShell, use:
+
+```powershell
+Copy-Item backend\.env.example backend\.env
+```
+
+Replace the placeholder value for `HF_API_KEY` in `backend/.env`, then restart the services with `docker compose up`. Compose loads this file when it exists; without it, the containers can still start, but AI-generated captions and meeting summaries will not work. Keep `.env` files local; do not commit your API token. The frontend uses the local backend URL by default and does not need its own `.env` file for the default setup. This optional env-file syntax requires Docker Compose 2.24.0 or later.
 
 ### Stop the Application
 
