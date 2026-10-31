@@ -1,5 +1,3 @@
-import React from "react";
-
 const SAND = "var(--color-retro-sand)";
 
 export function RuledLines({ count = 8 }: { count?: number }) {

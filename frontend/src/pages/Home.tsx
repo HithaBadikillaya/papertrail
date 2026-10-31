@@ -1,5 +1,4 @@
 "use client";
-import React from "react";
 import { HeroSection } from "../features/home/HeroSection";
 import FeatureCards from "../components/ui/FeatureCards";
 import Footer from "../components/layout/Footer";

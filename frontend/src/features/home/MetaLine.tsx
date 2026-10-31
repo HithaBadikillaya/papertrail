@@ -1,5 +1,3 @@
-import React from "react";
-
 const SAND = "var(--color-retro-sand)";
 const INK = "var(--color-retro-ink)";
 
